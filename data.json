@@ -1,0 +1,114 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nombre": "Alex Tech",
+      "email": "alex@tech.com",
+      "password": "123456",
+      "ordenes": 3,
+      "direcciones": [
+        {
+          "id": 1,
+          "direccion": "Calle 123 #45-67, Bogotá",
+          "ciudad": "Bogotá",
+          "telefono": "3001234567"
+        }
+      ],
+      "fechaRegistro": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "nombre": "Maria Gamer",
+      "email": "maria@gamer.com",
+      "password": "654321",
+      "ordenes": 5,
+      "direcciones": [
+        {
+          "id": 1,
+          "direccion": "Carrera 50 #20-30, Medellín",
+          "ciudad": "Medellín",
+          "telefono": "3017654321"
+        }
+      ],
+      "fechaRegistro": "2024-02-20T15:45:00.000Z"
+    }
+  ],
+  "productos": [
+    {
+      "id": 1,
+      "nombre": "Laptop Gamer Nitro X",
+      "precio": 5200000,
+      "imagen": "💻",
+      "specs": "Intel i7 • RTX 3050 • 16GB RAM",
+      "stock": 10,
+      "categoria": "laptops",
+      "descripcion": "Laptop gaming de alto rendimiento"
+    },
+    {
+      "id": 2,
+      "nombre": "Desktop Pro Gamer",
+      "precio": 8900000,
+      "imagen": "🖥️",
+      "specs": "Ryzen 9 • RTX 4080 • 32GB RAM",
+      "stock": 5,
+      "categoria": "desktops",
+      "descripcion": "Desktop para gaming extremo"
+    }
+  ],
+  "ordenes": [
+    {
+      "id": 1001,
+      "usuarioId": 1,
+      "fecha": "2024-03-10T14:20:00.000Z",
+      "items": [
+        {
+          "productoId": 1,
+          "nombre": "Laptop Gamer Nitro X",
+          "cantidad": 1,
+          "precio": 5200000
+        }
+      ],
+      "total": 5200000,
+      "estado": "entregado",
+      "metodoPago": "tarjeta"
+    },
+    {
+      "id": 1002,
+      "usuarioId": 2,
+      "fecha": "2024-03-15T09:30:00.000Z",
+      "items": [
+        {
+          "productoId": 3,
+          "nombre": "Monitor Curvo 27\"",
+          "cantidad": 1,
+          "precio": 1200000
+        },
+        {
+          "productoId": 4,
+          "nombre": "Teclado Mecánico RGB",
+          "cantidad": 1,
+          "precio": 350000
+        }
+      ],
+      "total": 1550000,
+      "estado": "enviado",
+      "metodoPago": "paypal"
+    }
+  ],
+  "metodosPago": [
+    {
+      "id": 1,
+      "usuarioId": 1,
+      "tipo": "tarjeta",
+      "numero": "**** **** **** 1234",
+      "nombre": "Alex Tech",
+      "vencimiento": "12/25"
+    },
+    {
+      "id": 2,
+      "usuarioId": 2,
+      "tipo": "paypal",
+      "email": "maria@gamer.com"
+    }
+  ]
+}

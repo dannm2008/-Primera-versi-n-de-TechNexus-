@@ -1,0 +1,449 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="es">
+    <title>TechNexus - Tienda Profesional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <h1 data-i18n="app_title">TechNexus</h1>
+            <p data-i18n="app_subtitle">Productos tecnológicos de alta gama</p>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <div id="screen-auth" class="screen active">
+                <div class="grid-2">
+                    <div class="card">
+                        <h2>Bienvenidos a TechNexus</h2>
+                        <p>Accede a tu cuenta</p>
+
+                        <div class="form-group">
+                            <label for="loginEmail">Gmail</label>
+                            <input type="email" id="loginEmail" name="loginEmail" autocomplete="email" placeholder="tu@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" placeholder="••••••••">
+                        </div>
+
+                        <div style="text-align: right; margin-bottom: 15px;">
+                            <a href="#" onclick="mostrarRecuperarPassword()" style="color: #93C5FD; text-decoration: none; font-size: 14px;">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <button class="btn-primary" onclick="login()">
+                            Iniciar sesión <span>→</span>
+                        </button>
+
+                        <div style="text-align: center; margin: 15px 0; color: #999;">o continúa con</div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-outline" style="flex:1; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="socialLogin('Google')">
+                                <img src="assets/images/google-logo.png" alt="Google" style="width: 20px; height: 20px; object-fit: contain;">
+                                Google
+                            </button>
+                            <button class="btn-outline" style="flex:1; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="socialLogin('Apple')">
+                                <img src="assets/images/apple-logo-white.svg" alt="Apple" style="width: 20px; height: 20px; object-fit: contain;">
+                                Apple
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Crear cuenta</h2>
+                        <p>Únete a la comunidad</p>
+
+                        <div class="form-group">
+                            <label for="regName">Nombre completo</label>
+                            <input type="text" id="regName" name="regName" autocomplete="name" placeholder="Alex Tech">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="regEmail">Gmail</label>
+                            <input type="email" id="regEmail" name="regEmail" autocomplete="email" placeholder="alex@tech.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="regPassword">Contraseña</label>
+                            <input type="password" id="regPassword" name="regPassword" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin: 15px 0;">
+                            <input type="checkbox" id="terms" name="terms">
+                            <label for="terms">Acepto términos y condiciones</label>
+                        </div>
+
+                        <button class="btn-primary" onclick="register()">
+                            Crear cuenta <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 25px; color: white; margin-top: 20px;">
+                    <h3 style="font-size: 24px;">🎮 ZONA GAMERS</h3>
+                    <p style="margin: 10px 0; opacity: 0.9;">Equipamiento de alto rendimiento con RGB</p>
+                    <button class="btn-outline" style="border-color: white; color: white; margin-top: 10px;" onclick="showScreen('products')">Explorar →</button>
+                </div>
+            </div>
+
+            <div id="screen-products" class="screen">
+                <h2 style="margin-bottom: 15px;">🔥 Productos destacados</h2>
+                <p style="color: #666; margin-bottom: 20px;">Lo mejor en tecnología para gaming y trabajo</p>
+
+                <div style="background: #1E293B; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 1px solid #2563EB;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                           <input type="text" id="searchInput" name="searchInput" placeholder="🔍 Buscar productos..."
+                               style="flex: 2; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white; outline: none;"
+                               onkeyup="buscarProductos()">
+                           <select id="filterCategory" name="filterCategory" onchange="buscarProductos()"
+                                style="flex: 1; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white;">
+                            <option value="todos">📁 Todas las categorías</option>
+                            <option value="laptops">💻 Laptops</option>
+                            <option value="desktops">🖥️ Desktops</option>
+                            <option value="monitores">🖥️ Monitores</option>
+                            <option value="accesorios">🎧 Accesorios</option>
+                        </select>
+                        <select id="filterPrice" name="filterPrice" onchange="buscarProductos()"
+                                style="flex: 1; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white;">
+                            <option value="todos">💰 Todos los precios</option>
+                            <option value="0-500000">Menos de $500.000</option>
+                            <option value="500000-2000000">$500.000 - $2.000.000</option>
+                            <option value="2000000+">Más de $2.000.000</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                           <input type="text" id="codigoCupon" name="codigoCupon" placeholder="🎫 ¿Tienes un cupón? Ingresa el código"
+                               style="flex: 2; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white;">
+                        <button class="btn-outline" onclick="aplicarCuponGlobal()" style="padding: 12px 24px; background: #2563EB; color: white; border: none;">
+                            Aplicar cupón
+                        </button>
+                    </div>
+                    <div id="cuponActivo" style="margin-top: 10px; display: none; color: #93C5FD;"></div>
+                </div>
+
+                <div class="product-grid" id="productosContainer"></div>
+            </div>
+
+            <div id="screen-cart" class="screen">
+                <h2 style="margin-bottom: 15px;">🛍️ Tu carrito</h2>
+                <div id="cartContainer"></div>
+            </div>
+
+            <div id="screen-profile" class="screen">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="color: #FFFFFF;">👤 Mi Perfil</h2>
+                    <button class="btn-outline" onclick="cerrarSesion()" style="background: #1E293B; border-color: #2563EB; color: white;">
+                        Cerrar sesión
+                    </button>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 25px; margin-bottom: 30px; background: #1E293B; border-radius: 20px; padding: 20px; border: 1px solid #2563EB;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">👤</div>
+                    <div>
+                        <h2 id="profileName" style="color: #FFFFFF; font-size: 28px;">Inicia sesión</h2>
+                        <p id="profileEmail" style="color: #93C5FD;">usuario@email.com</p>
+                        <p id="profileMemberSince" style="color: #E0F2FE; font-size: 13px;">Miembro desde: --</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #2563EB; overflow-x: auto;">
+                    <button class="profile-tab active" onclick="mostrarSeccionPerfil('historial')" style="background: transparent; border: none; padding: 12px 24px; color: white; cursor: pointer; font-weight: 600;">📦 Historial</button>
+                    <button class="profile-tab" onclick="mostrarSeccionPerfil('direcciones')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">📍 Direcciones</button>
+                    <button class="profile-tab" onclick="mostrarSeccionPerfil('pagos')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">💳 <span data-i18n="payment_methods">Métodos de pago</span></button>
+                    <button class="profile-tab" onclick="mostrarSeccionPerfil('favoritos')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">⭐ <span data-i18n="favorites">Favoritos</span></button>
+                    <button class="profile-tab" onclick="mostrarSeccionPerfil('ajustes')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">⚙️ <span data-i18n="settings">Ajustes</span></button>
+                </div>
+
+                <div id="perfil-content">
+                    <div id="seccion-historial" class="perfil-seccion active">
+                        <div id="puntos-container" style="margin-bottom: 20px;"></div>
+                        <h3 style="color: #FFFFFF; margin-bottom: 20px;">📦 <span data-i18n="purchase_history">Historial de compras</span></h3>
+                        <div id="historialCompras"></div>
+                    </div>
+
+                    <div id="seccion-direcciones" class="perfil-seccion" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="color: #FFFFFF;">📍 <span data-i18n="addresses">Mis direcciones</span></h3>
+                            <button class="btn-outline" onclick="agregarDireccion()" style="background: #1E293B; padding: 8px 16px;">+ Agregar nueva</button>
+                        </div>
+                        <div id="direccionesContainer"></div>
+                    </div>
+
+                    <div id="seccion-pagos" class="perfil-seccion" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="color: #FFFFFF;">💳 <span data-i18n="payment_methods">Métodos de pago</span></h3>
+                            <button class="btn-outline" onclick="agregarTarjeta()" style="background: #1E293B; padding: 8px 16px;">+ Agregar tarjeta</button>
+                        </div>
+                        <div id="tarjetasContainer"></div>
+                    </div>
+
+                    <div id="seccion-favoritos" class="perfil-seccion" style="display: none;">
+                        <h3 style="color: #FFFFFF; margin-bottom: 20px;">⭐ Productos favoritos</h3>
+                        <div id="favoritosContainer"></div>
+                    </div>
+
+                    <div id="seccion-ajustes" class="perfil-seccion" style="display: none;">
+                        <h3 style="color: #FFFFFF; margin-bottom: 20px;">⚙️ <span data-i18n="settings">Ajustes</span> de cuenta</h3>
+                        <div style="background: #1E293B; border-radius: 16px; padding: 20px; border: 1px solid #2563EB;">
+                            <div class="ajuste-item" style="margin-bottom: 20px;">
+                                <label for="editNombre" style="color: #FFFFFF; display: block; margin-bottom: 8px;">Nombre de usuario</label>
+                                <input type="text" id="editNombre" name="editNombre" class="form-input" style="background: #0F172A; border: 1px solid #2563EB; border-radius: 8px; padding: 10px; color: white; width: 100%;">
+                            </div>
+                            <div class="ajuste-item" style="margin-bottom: 20px;">
+                                <label for="editEmail" style="color: #FFFFFF; display: block; margin-bottom: 8px;">Correo electrónico</label>
+                                <input type="email" id="editEmail" name="editEmail" class="form-input" style="background: #0F172A; border: 1px solid #2563EB; border-radius: 8px; padding: 10px; color: white; width: 100%;">
+                            </div>
+                            <div class="ajuste-item" style="margin-bottom: 20px;">
+                                <label for="editPassword" style="color: #FFFFFF; display: block; margin-bottom: 8px;">Nueva contraseña</label>
+                                <input type="password" id="editPassword" name="editPassword" placeholder="Dejar en blanco para mantener" class="form-input" style="background: #0F172A; border: 1px solid #2563EB; border-radius: 8px; padding: 10px; color: white; width: 100%;">
+                            </div>
+                            <button class="btn-primary" onclick="guardarAjustes()" style="margin-top: 10px;">Guardar cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-empresa" class="screen">
+                <div style="margin-bottom: 20px;">
+                    <h2>🏢 Zona Empresarial</h2>
+                    <p style="color: #666;">Precios especiales y catálogo B2B</p>
+                </div>
+
+                <div id="empresaNoRegistrada" class="card" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 60px; margin-bottom: 20px;">🏢</div>
+                    <h3 style="margin-bottom: 15px;">¿Eres una empresa?</h3>
+                    <p style="color: #666; margin-bottom: 25px;">
+                        Regístrate para acceder a precios por volumen,
+                        facturación especial y envíos prioritarios.
+                    </p>
+                    <button class="btn-primary" style="width: auto; margin: 0 auto;" onclick="solicitarRegistroEmpresa()">
+                        Solicitar registro empresarial →
+                    </button>
+                </div>
+
+                <div id="empresaContent" style="display: none;">
+                    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="color: white;" id="empresaNombre"></h3>
+                                <p style="color: rgba(255,255,255,0.9);">NIT: <span id="empresaNit"></span></p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 24px; font-weight: 700;" id="empresaDescuento">0%</div>
+                                <p style="color: rgba(255,255,255,0.9);">descuento global</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-3" style="margin: 20px 0;">
+                        <div class="card" style="text-align: center;">
+                            <div style="font-size: 24px; color: #7b2cbf;">📊</div>
+                            <div style="font-size: 20px; font-weight: 700;" id="empresaCompras">0</div>
+                            <p style="color: #666;">Compras este mes</p>
+                        </div>
+                        <div class="card" style="text-align: center;">
+                            <div style="font-size: 24px; color: #7b2cbf;">💰</div>
+                            <div style="font-size: 20px; font-weight: 700;" id="empresaAhorro">$0</div>
+                            <p style="color: #666;">Ahorrado este año</p>
+                        </div>
+                        <div class="card" style="text-align: center;">
+                            <div style="font-size: 24px; color: #7b2cbf;">👥</div>
+                            <div style="font-size: 20px; font-weight: 700;" id="empresaUsuarios">1</div>
+                            <p style="color: #666;">Usuarios activos</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 20px 0 15px;">📦 Catálogo con precios especiales</h3>
+                    <div class="product-grid" id="productosEmpresa"></div>
+
+                    <h3 style="margin: 30px 0 15px;">📋 <span data-i18n="purchase_history">Historial de compras</span> corporativas</h3>
+                    <div id="historialEmpresa"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showScreen('auth')">
+                <span>🔐</span>
+                <span data-i18n="nav_access">Acceso</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('products')">
+                <span>💻</span>
+                <span data-i18n="nav_products">Productos</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('cart')">
+                <span>🛒</span>
+                <span data-i18n="nav_cart">Carrito <span id="cartCount" class="cart-badge">0</span></span>
+            </div>
+            <div class="nav-item" onclick="showScreen('empresa')">
+                <span>🏢</span>
+                <span data-i18n="nav_company">Empresa</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('profile')">
+                <span>👤</span>
+                <span data-i18n="nav_profile">Perfil</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="funciones/comunes/estado.js"></script>
+    <script src="funciones/notificaciones/notificaciones.js"></script>
+    <script src="funciones/comunes/utilidades.js"></script>
+    <script src="funciones/productos/productos.js"></script>
+    <script src="funciones/puntos/puntos.js"></script>
+    <script src="funciones/carrito/carrito.js"></script>
+    <script src="funciones/perfil/perfil.js"></script>
+    <script src="funciones/empresa/empresa.js"></script>
+    <script src="funciones/autenticacion/autenticacion.js"></script>
+    <script src="funciones/admin/admin.js"></script>
+    <script src="funciones/avanzadas/avanzadas.js"></script>
+    <script src="funciones/navegacion/navegacion.js"></script>
+    <script src="funciones/inicio/inicio.js"></script>
+
+    <!-- Google Translate Widget - Traduce TODO automáticamente -->
+    <div id="google_translate_element"></div>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'es',
+                includedLanguages: 'es,en,pt,fr,de,it,ja,ko,zh-CN,ru,ar',
+                layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        #google_translate_element {
+            position: fixed;
+            right: -6px;
+            bottom: calc(108px + env(safe-area-inset-bottom));
+            z-index: 9999;
+            font-size: 0 !important;
+            color: transparent !important;
+            overflow: hidden;
+            width: 112px;
+            text-align: right;
+        }
+
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+            position: relative !important;
+        }
+
+        .goog-te-gadget {
+            font-family: inherit !important;
+            font-size: 0 !important;
+            line-height: 0 !important;
+            color: transparent !important;
+            white-space: nowrap;
+        }
+
+        .goog-te-gadget .goog-te-combo {
+            background: #1E293B;
+            color: white;
+            border: 1px solid #2563EB;
+            border-radius: 14px;
+            padding: 7px 10px;
+            font-size: 12px;
+            min-width: 96px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .goog-te-gadget .goog-te-combo:hover {
+            background: #2563EB;
+            border-color: #3B82F6;
+        }
+
+        .goog-logo-link,
+        .goog-te-gadget > span,
+        #google_translate_element > span,
+        .goog-te-gadget img {
+            display: none !important;
+        }
+
+        iframe.skiptranslate {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            #google_translate_element {
+                right: -8px;
+                bottom: calc(96px + env(safe-area-inset-bottom));
+                width: 102px;
+            }
+
+            .goog-te-gadget .goog-te-combo {
+                padding: 7px 9px;
+                font-size: 11px;
+                min-width: 90px;
+            }
+        }
+    </style>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ========== CONFIGURACION SUPABASE ==========
+
+        // Tu Project URL
+        var SUPABASE_URL = window.SUPABASE_URL || "https://enqamwnclvsowirnlpmt.supabase.co";
+        window.SUPABASE_URL = SUPABASE_URL;
+
+        // Tu publishable key
+        var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "sb_publishable_tmJzoCw-61oxem5xP855SA_0ulZY7Yd";
+        window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
+
+        // Inicializar Supabase
+        var supabase = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabase;
+
+        console.log("Supabase conectado");
+        console.log("URL:", SUPABASE_URL);
+        console.log("Key:", SUPABASE_ANON_KEY.substring(0, 20) + "...");
+
+        // Probar conexion
+        async function testConexion() {
+            console.log("Probando conexion con Supabase...");
+
+            try {
+                // Intentar obtener productos
+                const { data, error } = await supabase.from("productos").select("*").limit(1);
+
+                if (error) {
+                    console.log("Error:", error.message);
+                    if (error.message.includes("relation") || error.message.includes("does not exist")) {
+                        console.log("Necesitas crear las tablas en SQL Editor");
+                    }
+                } else {
+                    console.log("Conexion exitosa con Supabase!");
+                    console.log("Productos encontrados:", data?.length || 0);
+                }
+            } catch (err) {
+                console.log("Error de conexion:", err);
+            }
+        }
+
+        testConexion();
+    </script>
+</body>
+</html>
+
+
+
