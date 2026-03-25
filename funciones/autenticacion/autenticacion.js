@@ -44,6 +44,11 @@ async function login() {
                     return;
                 }
 
+                if (errMsg.includes("too many") || errMsg.includes("rate limit") || errMsg.includes("429")) {
+                    notificarError("Demasiados intentos. Espera unos segundos e inténtalo de nuevo");
+                    return;
+                }
+
                 if (errMsg.includes("email not confirmed") || errMsg.includes("confirm")) {
                     notificarError("Debes confirmar tu correo para iniciar sesión en Supabase");
                     return;
@@ -143,6 +148,11 @@ async function register() {
             });
 
             if (authError) {
+                const errMsg = String(authError.message || "").toLowerCase();
+                if (errMsg.includes("too many") || errMsg.includes("rate limit") || errMsg.includes("429")) {
+                    notificarError("Demasiados intentos de registro. Espera unos segundos");
+                    return;
+                }
                 notificarError(authError.message || "No se pudo crear la cuenta");
                 return;
             }
@@ -281,4 +291,33 @@ function enviarRecuperacion() {
     }
 
     cerrarModalRecuperar();
+}
+
+if (!window.__authClickGuardInstalled) {
+    const loginOriginal = login;
+    const registerOriginal = register;
+
+    window.login = async function loginConProteccion() {
+        const ahora = Date.now();
+        const ultimoIntento = window.__ultimoIntentoLogin || 0;
+        if ((ahora - ultimoIntento) < 2500) {
+            notificarError("Espera un momento antes de intentar iniciar sesión otra vez");
+            return;
+        }
+        window.__ultimoIntentoLogin = ahora;
+        return await loginOriginal();
+    };
+
+    window.register = async function registerConProteccion() {
+        const ahora = Date.now();
+        const ultimoIntento = window.__ultimoIntentoRegistro || 0;
+        if ((ahora - ultimoIntento) < 4000) {
+            notificarError("Espera unos segundos antes de volver a registrar");
+            return;
+        }
+        window.__ultimoIntentoRegistro = ahora;
+        return await registerOriginal();
+    };
+
+    window.__authClickGuardInstalled = true;
 }
