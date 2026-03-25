@@ -92,6 +92,7 @@ function calcularPromedioProducto(productoId) {
 function mostrarResenas(productoId) {
     const resenasProducto = obtenerResenasProducto(productoId);
     const promedio = calcularPromedioProducto(productoId);
+    const adminEmail = typeof ADMIN_EMAIL !== "undefined" ? ADMIN_EMAIL : "admin@technexus.com";
 
     let html = `
         <div class="resenas-section">
@@ -118,7 +119,7 @@ function mostrarResenas(productoId) {
                 <div class="resena-fecha">${new Date(r.fecha).toLocaleDateString()}</div>
                 <div class="resena-acciones">
                     <button onclick="likeResena(${r.id})" aria-label="Dar like a reseña" title="Me gusta">👍 ${r.likes || 0}</button>
-                    ${usuarioActual?.email === ADMIN_EMAIL ? `<button onclick="eliminarResena(${r.id})" aria-label="Eliminar reseña" title="Eliminar reseña">🗑️</button>` : ""}
+                    ${usuarioActual?.email === adminEmail ? `<button onclick="eliminarResena(${r.id})" aria-label="Eliminar reseña" title="Eliminar reseña">🗑️</button>` : ""}
                 </div>
             </div>
         `;
@@ -138,7 +139,8 @@ function likeResena(resenaId) {
 }
 
 function eliminarResena(resenaId) {
-    if (usuarioActual?.email !== ADMIN_EMAIL) return;
+    const adminEmail = typeof ADMIN_EMAIL !== "undefined" ? ADMIN_EMAIL : "admin@technexus.com";
+    if (usuarioActual?.email !== adminEmail) return;
     resenas = resenas.filter(r => Number(r.id) !== Number(resenaId));
     localStorage.setItem("resenas", JSON.stringify(resenas));
     mostrarNotificacion("Reseña eliminada", "success", "Moderación");
@@ -162,7 +164,7 @@ function mostrarFormularioResena(productoId) {
                 </div>
                 <div class="form-group"><label>Comentario</label><textarea id="resenaComentario" placeholder="Cuéntanos tu experiencia"></textarea></div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="admin-btn" onclick="enviarResenaDesdeFormulario(${productoId})">Publicar</button>
+                    <button class="admin-btn" onclick="enviarResenaDesdeFormulario(${JSON.stringify(productoId)})">Publicar</button>
                     <button class="admin-btn admin-btn-danger" onclick="cerrarResenaForm()">Cancelar</button>
                 </div>
             </div>
@@ -333,6 +335,15 @@ function agregarAWishlist(productoId) {
     if (!wishlist.some(item => idsIguales(item.id, productoId))) {
         wishlist.push(producto);
         guardarWishlistUsuario();
+
+        if (usuarioData && Array.isArray(usuarioData.favoritos)) {
+            const idTexto = String(producto.id);
+            if (!usuarioData.favoritos.some(id => idsIguales(id, idTexto))) {
+                usuarioData.favoritos.push(idTexto);
+                if (typeof guardarUsuarioData === "function") guardarUsuarioData();
+            }
+        }
+
         notificarExito(`${producto.nombre} agregado a favoritos`);
     } else {
         mostrarNotificacion(`${producto.nombre} ya está en favoritos`, "info", "Favoritos");
@@ -343,6 +354,12 @@ function eliminarDeWishlist(productoId) {
     cargarWishlistUsuario();
     wishlist = wishlist.filter(item => !idsIguales(item.id, productoId));
     guardarWishlistUsuario();
+
+    if (usuarioData && Array.isArray(usuarioData.favoritos)) {
+        usuarioData.favoritos = usuarioData.favoritos.filter(id => !idsIguales(id, productoId));
+        if (typeof guardarUsuarioData === "function") guardarUsuarioData();
+    }
+
     notificarExito("Producto eliminado de favoritos");
     abrirWishlistModal();
 }

@@ -197,7 +197,11 @@ function mostrarFavoritos() {
     const container = document.getElementById("favoritosContainer");
     if (!container) return;
 
-    const favoritosProductos = productos.filter(p => usuarioData.favoritos.includes(p.id));
+    const favoritosIds = Array.isArray(usuarioData.favoritos)
+        ? usuarioData.favoritos.map(id => String(id))
+        : [];
+
+    const favoritosProductos = productos.filter(p => favoritosIds.includes(String(p.id)));
     if (!favoritosProductos.length) {
         container.innerHTML = `<div class="empty-cart" style="background: #1E293B; border-radius: 16px; padding: 40px; text-align: center;"><p style="color: #94A3B8;">No tienes productos favoritos</p></div>`;
         return;
@@ -205,13 +209,14 @@ function mostrarFavoritos() {
 
     let html = '<div class="product-grid">';
     favoritosProductos.forEach(p => {
+        const idArg = JSON.stringify(p.id);
         html += `
             <div class="product-card">
                 <div style="font-size: 20px; text-align: center;">${p.imagen}</div>
                 <div class="product-title">${p.nombre}</div>
                 <div class="product-price">$${p.precio.toLocaleString()}</div>
-                <button class="btn-add" onclick="agregarAlCarrito(${p.id})">Agregar +</button>
-                <button class="btn-outline" onclick="quitarFavorito(${p.id})" style="margin-top: 8px; width: 100%;">❤️ Quitar</button>
+                <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
+                <button class="btn-outline" onclick="quitarFavorito(${idArg})" style="margin-top: 8px; width: 100%;">❤️ Quitar</button>
             </div>
         `;
     });
@@ -271,8 +276,14 @@ function establecerPrincipal(tipo, id) {
 }
 
 function quitarFavorito(productId) {
-    usuarioData.favoritos = usuarioData.favoritos.filter(id => id !== productId);
+    usuarioData.favoritos = (usuarioData.favoritos || []).filter(id => String(id) !== String(productId));
     guardarUsuarioData();
+
+    if (typeof wishlist !== "undefined" && Array.isArray(wishlist)) {
+        wishlist = wishlist.filter(item => String(item.id) !== String(productId));
+        if (typeof guardarWishlistUsuario === "function") guardarWishlistUsuario();
+    }
+
     mostrarFavoritos();
     mostrarMensaje("Producto eliminado de favoritos");
 }
