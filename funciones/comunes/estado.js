@@ -18,6 +18,28 @@ let cuponesDisponibles = [
 ];
 let usuariosRegistrados = JSON.parse(localStorage.getItem("usuariosRegistrados") || "[]");
 
+if (!window.__usuarioActualBridge) {
+    Object.defineProperty(window, "usuarioActual", {
+        configurable: true,
+        get() {
+            return usuarioActual;
+        },
+        set(value) {
+            usuarioActual = value || null;
+
+            if (usuarioActual) {
+                localStorage.setItem("usuarioActual", JSON.stringify(usuarioActual));
+                localStorage.setItem("usuario", JSON.stringify(usuarioActual));
+            } else {
+                localStorage.removeItem("usuarioActual");
+                localStorage.removeItem("usuario");
+            }
+        }
+    });
+
+    window.__usuarioActualBridge = true;
+}
+
 const perfilStorageKey = "usuarioDataTechNexus";
 const usuariosDataKey = "usuariosData";
 const historialGlobalKey = "historialGlobal";
@@ -166,6 +188,8 @@ if (usuarioSesion && usuarioSesion.email) {
     usuarioActual = usuarioSesion;
     sincronizarUsuarioDataActual();
 }
+
+window.usuarioActual = usuarioActual;
 
 function guardarUsuarioData() {
     if (usuarioActual && usuarioActual.email) {
