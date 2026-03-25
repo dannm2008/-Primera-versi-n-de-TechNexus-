@@ -402,64 +402,25 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        // ========== CONFIGURACION SUPABASE ==========
+        // Configuración de Supabase
+        const SUPABASE_URL = "https://enqamwnclvsowirnlpmt.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tmJzoCw-61oxem5xP855SA_0ulZY7Yd";
 
-        // Tu Project URL
-        var SUPABASE_URL = window.SUPABASE_URL || "https://enqamwnclvsowirnlpmt.supabase.co";
-        window.SUPABASE_URL = SUPABASE_URL;
+        // Inicializar Supabase (solo una vez)
+        if (!window.supabaseClient) {
+            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("🔥 Supabase conectado");
+        }
 
-        // Tu publishable key
-        var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "sb_publishable_tmJzoCw-61oxem5xP855SA_0ulZY7Yd";
-        window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
-
-        // Inicializar Supabase de forma segura
-        var supabase = window.supabaseClient || null;
-
-        try {
-            if (!supabase && window.supabase && typeof window.supabase.createClient === "function") {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                window.supabaseClient = supabase;
+        // Probar conexión
+        (async function() {
+            const { data, error } = await window.supabaseClient.from('productos').select('count');
+            if (error) {
+                console.log("❌ Error:", error.message);
+            } else {
+                console.log("✅ Conexión exitosa con Supabase!");
             }
-        } catch (initError) {
-            console.error("Error inicializando Supabase:", initError);
-        }
-
-        if (supabase) {
-            console.log("Supabase conectado");
-            console.log("URL:", SUPABASE_URL);
-            console.log("Key:", SUPABASE_ANON_KEY.substring(0, 20) + "...");
-        } else {
-            console.error("Supabase no disponible. Revisa bloqueo de CDN/extensiones o conexión.");
-        }
-
-        // Probar conexion
-        async function testConexion() {
-            console.log("Probando conexion con Supabase...");
-
-            try {
-                // Intentar obtener productos
-                if (!supabase) {
-                    console.log("Supabase no inicializado: se omite prueba de conexión");
-                    return;
-                }
-
-                const { data, error } = await supabase.from("productos").select("*").limit(1);
-
-                if (error) {
-                    console.log("Error:", error.message);
-                    if (error.message.includes("relation") || error.message.includes("does not exist")) {
-                        console.log("Necesitas crear las tablas en SQL Editor");
-                    }
-                } else {
-                    console.log("Conexion exitosa con Supabase!");
-                    console.log("Productos encontrados:", data?.length || 0);
-                }
-            } catch (err) {
-                console.log("Error de conexion:", err);
-            }
-        }
-
-        testConexion();
+        })();
     </script>
 </body>
 </html>
