@@ -18,7 +18,7 @@ async function actualizarPerfil() {
         await mostrarHistorialCompras();
         mostrarDirecciones();
         mostrarTarjetas();
-        mostrarFavoritos();
+        await mostrarFavoritos();
         if (typeof actualizarPantallaPuntos === "function") actualizarPantallaPuntos();
     } else {
         profileName.textContent = "Inicia sesión";
@@ -193,9 +193,17 @@ function mostrarTarjetas() {
     container.innerHTML = html;
 }
 
-function mostrarFavoritos() {
+async function mostrarFavoritos() {
     const container = document.getElementById("favoritosContainer");
     if (!container) return;
+
+    if (usuarioActual && typeof cargarFavoritosSupabase === "function") {
+        const favoritosSupabase = await cargarFavoritosSupabase();
+        if (Array.isArray(favoritosSupabase)) {
+            usuarioData.favoritos = favoritosSupabase;
+            guardarUsuarioData();
+        }
+    }
 
     const favoritosIds = Array.isArray(usuarioData.favoritos)
         ? usuarioData.favoritos.map(id => String(id))
@@ -275,16 +283,20 @@ function establecerPrincipal(tipo, id) {
     mostrarMensaje("Principal actualizado");
 }
 
-function quitarFavorito(productId) {
+async function quitarFavorito(productId) {
     usuarioData.favoritos = (usuarioData.favoritos || []).filter(id => String(id) !== String(productId));
     guardarUsuarioData();
+
+    if (typeof guardarFavoritosSupabase === "function") {
+        await guardarFavoritosSupabase(usuarioData.favoritos || []);
+    }
 
     if (typeof wishlist !== "undefined" && Array.isArray(wishlist)) {
         wishlist = wishlist.filter(item => String(item.id) !== String(productId));
         if (typeof guardarWishlistUsuario === "function") guardarWishlistUsuario();
     }
 
-    mostrarFavoritos();
+    await mostrarFavoritos();
     mostrarMensaje("Producto eliminado de favoritos");
 }
 
@@ -395,5 +407,9 @@ function mostrarSeccionPerfil(seccion) {
     if (tabActivo) {
         tabActivo.style.color = "#FFFFFF";
         tabActivo.classList.add("active");
+    }
+
+    if (seccion === "favoritos") {
+        void mostrarFavoritos();
     }
 }

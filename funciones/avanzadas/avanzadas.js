@@ -41,12 +41,135 @@ function guardarWishlistUsuario() {
     localStorage.setItem(keyPorUsuario("wishlist"), JSON.stringify(wishlist));
 }
 
+function getUsuarioUidActual() {
+    return String(usuarioActual?.uid || usuarioActual?.id || "");
+}
+
+async function cargarFavoritosSupabase() {
+    if (!window.supabaseClient || !usuarioActual) return null;
+
+    const uid = getUsuarioUidActual();
+    if (!uid) return null;
+
+    try {
+        const { data, error } = await window.supabaseClient
+            .from("usuarios")
+            .select("favoritos")
+            .eq("uid", uid)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Error cargando favoritos desde Supabase:", error.message);
+            return null;
+        }
+
+        const favoritos = Array.isArray(data?.favoritos) ? data.favoritos.map(id => String(id)) : [];
+        return favoritos;
+    } catch (err) {
+        console.error("Error de conexión al cargar favoritos:", err);
+        return null;
+    }
+}
+
+async function guardarFavoritosSupabase(favoritosIds = []) {
+    if (!window.supabaseClient || !usuarioActual) return false;
+
+    const uid = getUsuarioUidActual();
+    if (!uid) return false;
+
+    const payloadFavoritos = Array.isArray(favoritosIds) ? favoritosIds.map(id => String(id)) : [];
+
+    try {
+        const payloadUsuario = {
+            uid,
+            nombre: usuarioActual.nombre || String(usuarioActual.email || "usuario").split("@")[0],
+            email: usuarioActual.email,
+            favoritos: payloadFavoritos
+        };
+
+        const { error } = await window.supabaseClient
+            .from("usuarios")
+            .upsert(payloadUsuario, { onConflict: "uid" });
+
+        if (error) {
+            console.error("Error guardando favoritos en Supabase:", error.message);
+            return false;
+        }
+
+        return true;
+    } catch (err) {
+        console.error("Error de conexión guardando favoritos:", err);
+        return false;
+    }
+}
+
+async function sincronizarFavoritosConSupabase() {
+    if (!usuarioActual) return;
+
+    const favoritosSupabase = await cargarFavoritosSupabase();
+    if (!Array.isArray(favoritosSupabase)) return;
+
+    if (usuarioData && Array.isArray(usuarioData.favoritos)) {
+        usuarioData.favoritos = favoritosSupabase;
+        if (typeof guardarUsuarioData === "function") guardarUsuarioData();
+    }
+
+    wishlist = productos.filter(p => favoritosSupabase.some(id => idsIguales(id, p.id)));
+    guardarWishlistUsuario();
+    actualizarIconosFavoritosEnProductos();
+}
+
+function actualizarIconosFavoritosEnProductos() {
+    const favoritos = Array.isArray(usuarioData?.favoritos) ? usuarioData.favoritos.map(id => String(id)) : [];
+    document.querySelectorAll(".btn-fav[data-product-id]").forEach(btn => {
+        const productId = String(btn.getAttribute("data-product-id") || "");
+        const esFavorito = favoritos.some(id => idsIguales(id, productId));
+        btn.textContent = esFavorito ? "❤️" : "🤍";
+    });
+}
+
+async function obtenerResenasSupabase(productoId) {
+    if (!window.supabaseClient) return null;
+
+    try {
+        const { data, error } = await window.supabaseClient
+            .from("resenas")
+            .select("*")
+            .eq("producto_id", String(productoId))
+            .order("fecha", { ascending: false });
+
+        if (error) {
+            console.error("Error cargando reseñas desde Supabase:", error.message);
+            return null;
+        }
+
+        return (data || []).map(r => ({
+            id: String(r.id),
+            productoId: String(r.producto_id),
+            usuario: r.usuario_nombre || "Usuario",
+            usuarioEmail: r.usuario_email || "",
+            calificacion: Number(r.calificacion || 0),
+            titulo: r.titulo || "",
+            comentario: r.comentario || "",
+            fecha: r.fecha || new Date().toISOString(),
+            likes: Number(r.likes || 0),
+            reportes: Number(r.reportes || 0)
+        }));
+    } catch (err) {
+        console.error("Error de conexión al cargar reseñas:", err);
+        return null;
+    }
+}
+
+window.cargarFavoritosSupabase = cargarFavoritosSupabase;
+window.guardarFavoritosSupabase = guardarFavoritosSupabase;
+
 // ========== SISTEMA DE RESENAS ==========
 
-function agregarResena(productoId, calificacion, comentario, titulo) {
+async function agregarResena(productoId, calificacion, comentario, titulo) {
     if (!usuarioActual) {
         notificarError("Inicia sesión para dejar una reseña");
-        return;
+        return false;
     }
 
     const historial = getHistorialUsuario();
@@ -57,11 +180,38 @@ function agregarResena(productoId, calificacion, comentario, titulo) {
 
     if (!haComprado) {
         notificarError("Solo puedes reseñar productos que has comprado");
-        return;
+        return false;
+    }
+
+    if (window.supabaseClient) {
+        const payload = {
+            producto_id: String(productoId),
+            usuario_id: getUsuarioUidActual(),
+            usuario_nombre: usuarioActual.nombre,
+            usuario_email: usuarioActual.email,
+            calificacion: Number(calificacion),
+            titulo,
+            comentario
+        };
+
+        try {
+            const { error } = await window.supabaseClient
+                .from("resenas")
+                .insert(payload);
+
+            if (!error) {
+                if (typeof notificarResenaPublicada === "function") notificarResenaPublicada();
+                return true;
+            }
+
+            console.error("Error guardando reseña en Supabase:", error.message);
+        } catch (err) {
+            console.error("Error de conexión al guardar reseña:", err);
+        }
     }
 
     const resena = {
-        id: Date.now(),
+        id: Date.now().toString(),
         productoId: String(productoId),
         usuario: usuarioActual.nombre,
         usuarioEmail: usuarioActual.email,
@@ -76,22 +226,25 @@ function agregarResena(productoId, calificacion, comentario, titulo) {
     resenas.push(resena);
     localStorage.setItem("resenas", JSON.stringify(resenas));
     if (typeof notificarResenaPublicada === "function") notificarResenaPublicada();
+    return true;
 }
 
-function obtenerResenasProducto(productoId) {
+async function obtenerResenasProducto(productoId) {
+    const resenasRemotas = await obtenerResenasSupabase(productoId);
+    if (Array.isArray(resenasRemotas)) return resenasRemotas;
     return resenas.filter(r => idsIguales(r.productoId, productoId));
 }
 
-function calcularPromedioProducto(productoId) {
-    const resenasProducto = obtenerResenasProducto(productoId);
+async function calcularPromedioProducto(productoId) {
+    const resenasProducto = await obtenerResenasProducto(productoId);
     if (!resenasProducto.length) return 0;
     const promedio = resenasProducto.reduce((sum, r) => sum + Number(r.calificacion || 0), 0) / resenasProducto.length;
     return Math.round(promedio * 10) / 10;
 }
 
-function mostrarResenas(productoId) {
-    const resenasProducto = obtenerResenasProducto(productoId);
-    const promedio = calcularPromedioProducto(productoId);
+async function mostrarResenas(productoId) {
+    const resenasProducto = await obtenerResenasProducto(productoId);
+    const promedio = await calcularPromedioProducto(productoId);
     const adminEmail = typeof ADMIN_EMAIL !== "undefined" ? ADMIN_EMAIL : "admin@technexus.com";
 
     let html = `
@@ -118,8 +271,8 @@ function mostrarResenas(productoId) {
                 <div class="resena-comentario">${r.comentario || ""}</div>
                 <div class="resena-fecha">${new Date(r.fecha).toLocaleDateString()}</div>
                 <div class="resena-acciones">
-                    <button onclick="likeResena(${r.id})" aria-label="Dar like a reseña" title="Me gusta">👍 ${r.likes || 0}</button>
-                    ${usuarioActual?.email === adminEmail ? `<button onclick="eliminarResena(${r.id})" aria-label="Eliminar reseña" title="Eliminar reseña">🗑️</button>` : ""}
+                    <button onclick="likeResena(${JSON.stringify(r.id)})" aria-label="Dar like a reseña" title="Me gusta">👍 ${r.likes || 0}</button>
+                    ${usuarioActual?.email === adminEmail ? `<button onclick="eliminarResena(${JSON.stringify(r.id)})" aria-label="Eliminar reseña" title="Eliminar reseña">🗑️</button>` : ""}
                 </div>
             </div>
         `;
@@ -129,19 +282,19 @@ function mostrarResenas(productoId) {
     return html;
 }
 
-function likeResena(resenaId) {
-    const resena = resenas.find(r => Number(r.id) === Number(resenaId));
+async function likeResena(resenaId) {
+    const resena = resenas.find(r => idsIguales(r.id, resenaId));
     if (!resena) return;
     resena.likes = Number(resena.likes || 0) + 1;
     localStorage.setItem("resenas", JSON.stringify(resenas));
     const modal = document.getElementById("resenasModalBody");
-    if (modal) modal.innerHTML = mostrarResenas(resena.productoId);
+    if (modal) modal.innerHTML = await mostrarResenas(resena.productoId);
 }
 
 function eliminarResena(resenaId) {
     const adminEmail = typeof ADMIN_EMAIL !== "undefined" ? ADMIN_EMAIL : "admin@technexus.com";
     if (usuarioActual?.email !== adminEmail) return;
-    resenas = resenas.filter(r => Number(r.id) !== Number(resenaId));
+    resenas = resenas.filter(r => !idsIguales(r.id, resenaId));
     localStorage.setItem("resenas", JSON.stringify(resenas));
     mostrarNotificacion("Reseña eliminada", "success", "Moderación");
 }
@@ -178,7 +331,7 @@ function cerrarResenaForm() {
     if (form) form.remove();
 }
 
-function enviarResenaDesdeFormulario(productoId) {
+async function enviarResenaDesdeFormulario(productoId) {
     const titulo = (document.getElementById("resenaTitulo")?.value || "").trim();
     const calificacion = Number(document.getElementById("resenaCalificacion")?.value || "0");
     const comentario = (document.getElementById("resenaComentario")?.value || "").trim();
@@ -188,12 +341,13 @@ function enviarResenaDesdeFormulario(productoId) {
         return;
     }
 
-    agregarResena(productoId, calificacion, comentario, titulo);
+    const ok = await agregarResena(productoId, calificacion, comentario, titulo);
+    if (!ok) return;
     cerrarResenaForm();
-    abrirModalResenas(productoId);
+    await abrirModalResenas(productoId);
 }
 
-function abrirModalResenas(productoId) {
+async function abrirModalResenas(productoId) {
     const producto = productos.find(p => idsIguales(p.id, productoId));
     if (!producto) return;
 
@@ -207,12 +361,14 @@ function abrirModalResenas(productoId) {
                     <h3>⭐ Reseñas - ${producto.nombre}</h3>
                     <button class="admin-btn admin-btn-danger" onclick="cerrarResenasModal()">Cerrar</button>
                 </div>
-                <div id="resenasModalBody">${mostrarResenas(productoId)}</div>
+                <div id="resenasModalBody"><div style="text-align:center; padding: 20px;">Cargando reseñas...</div></div>
             </div>
         </div>
     `;
 
     document.body.insertAdjacentHTML("beforeend", modal);
+    const body = document.getElementById("resenasModalBody");
+    if (body) body.innerHTML = await mostrarResenas(productoId);
 }
 
 function cerrarResenasModal() {
@@ -322,13 +478,14 @@ function notificarStockDisponible(productoNombre) {
 
 // ========== LISTA DE DESEOS ==========
 
-function agregarAWishlist(productoId) {
+async function agregarAWishlist(productoId) {
     if (!usuarioActual) {
         notificarError("Inicia sesión para guardar productos");
         return;
     }
 
     cargarWishlistUsuario();
+    await sincronizarFavoritosConSupabase();
     const producto = productos.find(p => idsIguales(p.id, productoId));
     if (!producto) return;
 
@@ -344,13 +501,26 @@ function agregarAWishlist(productoId) {
             }
         }
 
+        await guardarFavoritosSupabase(usuarioData?.favoritos || wishlist.map(item => String(item.id)));
+
         notificarExito(`${producto.nombre} agregado a favoritos`);
     } else {
-        mostrarNotificacion(`${producto.nombre} ya está en favoritos`, "info", "Favoritos");
+        wishlist = wishlist.filter(item => !idsIguales(item.id, productoId));
+        guardarWishlistUsuario();
+
+        if (usuarioData && Array.isArray(usuarioData.favoritos)) {
+            usuarioData.favoritos = usuarioData.favoritos.filter(id => !idsIguales(id, productoId));
+            if (typeof guardarUsuarioData === "function") guardarUsuarioData();
+        }
+
+        await guardarFavoritosSupabase(usuarioData?.favoritos || wishlist.map(item => String(item.id)));
+        mostrarNotificacion(`${producto.nombre} eliminado de favoritos`, "info", "Favoritos");
     }
+
+    actualizarIconosFavoritosEnProductos();
 }
 
-function eliminarDeWishlist(productoId) {
+async function eliminarDeWishlist(productoId) {
     cargarWishlistUsuario();
     wishlist = wishlist.filter(item => !idsIguales(item.id, productoId));
     guardarWishlistUsuario();
@@ -360,7 +530,10 @@ function eliminarDeWishlist(productoId) {
         if (typeof guardarUsuarioData === "function") guardarUsuarioData();
     }
 
+    await guardarFavoritosSupabase(usuarioData?.favoritos || wishlist.map(item => String(item.id)));
+
     notificarExito("Producto eliminado de favoritos");
+    actualizarIconosFavoritosEnProductos();
     abrirWishlistModal();
 }
 
@@ -730,7 +903,9 @@ function inicializarFuncionalidadesAvanzadas() {
     cargarNotificacionesUsuario();
     cargarWishlistUsuario();
     guardarOfertasActivas();
+    void sincronizarFavoritosConSupabase();
     instalarAccesosAvanzadosUI();
+    actualizarIconosFavoritosEnProductos();
 }
 
 if (!window.__ofertasCounterStarted) {

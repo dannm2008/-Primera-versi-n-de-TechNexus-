@@ -129,7 +129,7 @@ function mostrarProductosFiltrados(productosFiltrados) {
                 </div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
                 <div style="display: flex; gap: 8px; margin-top: 8px;">
-                    <button class="btn-outline" style="flex:1; padding: 8px 10px;" onclick="agregarAWishlist(${idArg})">❤️ Favoritos</button>
+                    <button class="btn-outline btn-fav" data-product-id="${String(producto.id)}" style="flex:1; padding: 8px 10px;" onclick="agregarAWishlist(${idArg})">🤍 Favoritos</button>
                     <button class="btn-outline" style="flex:1; padding: 8px 10px;" onclick="abrirModalResenas(${idArg})">⭐ Reseñas</button>
                 </div>
             </div>
@@ -137,6 +137,9 @@ function mostrarProductosFiltrados(productosFiltrados) {
     });
 
     container.innerHTML = ofertasHtml + html;
+    if (typeof actualizarIconosFavoritosEnProductos === "function") {
+        actualizarIconosFavoritosEnProductos();
+    }
 }
 
 function limpiarFiltros() {
