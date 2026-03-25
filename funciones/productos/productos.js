@@ -1,3 +1,7 @@
+let ultimaCargaProductos = Array.isArray(productos) && productos.length ? Date.now() : 0;
+let cargaProductosEnCurso = null;
+const CACHE_PRODUCTOS_MS = 30000;
+
 function normalizarProductoSupabase(producto) {
     return {
         id: String(producto.id),
@@ -10,27 +14,43 @@ function normalizarProductoSupabase(producto) {
     };
 }
 
-async function cargarProductosDesdeSupabase() {
+async function cargarProductosDesdeSupabase(force = false) {
     if (!window.supabaseClient) return false;
 
-    try {
-        const { data, error } = await window.supabaseClient
-            .from("productos")
-            .select("*");
-
-        if (error) {
-            console.error("Error al cargar productos desde Supabase:", error.message);
-            return false;
-        }
-
-        productos.length = 0;
-        (data || []).map(normalizarProductoSupabase).forEach(p => productos.push(p));
-        localStorage.setItem("productos", JSON.stringify(productos));
+    const ahora = Date.now();
+    if (!force && productos.length && (ahora - ultimaCargaProductos) < CACHE_PRODUCTOS_MS) {
         return true;
-    } catch (err) {
-        console.error("Error de conexión con Supabase:", err);
-        return false;
     }
+
+    if (cargaProductosEnCurso) {
+        return await cargaProductosEnCurso;
+    }
+
+    cargaProductosEnCurso = (async () => {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from("productos")
+                .select("*");
+
+            if (error) {
+                console.error("Error al cargar productos desde Supabase:", error.message);
+                return false;
+            }
+
+            productos.length = 0;
+            (data || []).map(normalizarProductoSupabase).forEach(p => productos.push(p));
+            localStorage.setItem("productos", JSON.stringify(productos));
+            ultimaCargaProductos = Date.now();
+            return true;
+        } catch (err) {
+            console.error("Error de conexión con Supabase:", err);
+            return false;
+        } finally {
+            cargaProductosEnCurso = null;
+        }
+    })();
+
+    return await cargaProductosEnCurso;
 }
 
 async function mostrarProductos() {
