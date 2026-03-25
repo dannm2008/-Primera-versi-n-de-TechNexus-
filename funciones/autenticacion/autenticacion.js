@@ -7,89 +7,118 @@ async function login() {
         return;
     }
 
-    // Prioriza Supabase Auth cuando está disponible.
-    if (window.supabaseClient) {
-        const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+    const loginLocal = () => {
+        const usuario = usuariosRegistrados.find(u => u.email === email && u.password === password);
+        if (!usuario) return false;
 
-        if (error) {
-            notificarError(error.message || "No se pudo iniciar sesión");
-            return;
-        }
-
-        const authUser = data?.user;
-        if (!authUser) {
-            notificarError("No se recibió usuario de Supabase");
-            return;
-        }
-
-        let perfil = null;
-        try {
-            const { data: perfilData, error: perfilError } = await window.supabaseClient
-                .from("usuarios")
-                .select("*")
-                .eq("uid", authUser.id)
-                .maybeSingle();
-
-            if (!perfilError) perfil = perfilData;
-        } catch (_) {
-            // Si la tabla usuarios aún no existe, usamos datos del auth user.
-        }
-
-        const nombrePerfil = perfil?.nombre || authUser.user_metadata?.nombre || String(email).split("@")[0] || "Usuario";
-        const esAdminPerfil = Boolean(perfil?.es_admin || perfil?.esAdmin || email === ADMIN_EMAIL);
-
-        usuarioActual = {
-            id: perfil?.id || authUser.id,
-            uid: authUser.id,
-            nombre: nombrePerfil,
-            email: perfil?.email || email,
-            esAdmin: esAdminPerfil,
-            es_admin: esAdminPerfil
-        };
-
+        usuarioActual = { nombre: usuario.nombre, email: usuario.email, esAdmin: Boolean(usuario.esAdmin) };
         localStorage.setItem("usuarioActual", JSON.stringify(usuarioActual));
-        localStorage.setItem("usuario", JSON.stringify(usuarioActual));
 
         sincronizarUsuarioDataActual();
-        usuarioData.nombre = usuarioActual.nombre;
-        usuarioData.email = usuarioActual.email;
-        usuarioData.fechaRegistro = (perfil?.fecha_creacion || perfil?.fechaRegistro || new Date().toISOString()).split("T")[0];
-        guardarDatosUsuario(usuarioActual.email, usuarioData);
+        usuarioData.nombre = usuario.nombre;
+        usuarioData.email = usuario.email;
+        usuarioData.fechaRegistro = (usuario.fechaRegistro || new Date().toISOString()).split("T")[0];
+        guardarDatosUsuario(usuario.email, usuarioData);
 
-        if (typeof cargarCarritoNube === "function") await cargarCarritoNube();
         if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
         if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
 
-        notificarBienvenida(usuarioActual.nombre);
+        notificarBienvenida(usuario.nombre);
         actualizarPerfil();
         showScreen("products");
-        return;
+        return true;
+    };
+
+    // Prioriza Supabase Auth cuando está disponible.
+    if (window.supabaseClient) {
+        try {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
+
+            if (error) {
+                const errMsg = String(error.message || "").toLowerCase();
+                if (loginLocal()) {
+                    notificarExito("Ingresaste con datos locales");
+                    return;
+                }
+
+                if (errMsg.includes("email not confirmed") || errMsg.includes("confirm")) {
+                    notificarError("Debes confirmar tu correo para iniciar sesión en Supabase");
+                    return;
+                }
+
+                notificarError(error.message || "No se pudo iniciar sesión");
+                return;
+            }
+
+            const authUser = data?.user;
+            if (!authUser) {
+                if (loginLocal()) {
+                    notificarExito("Ingresaste con datos locales");
+                    return;
+                }
+                notificarError("No se recibió usuario de Supabase");
+                return;
+            }
+
+            let perfil = null;
+            try {
+                const { data: perfilData, error: perfilError } = await window.supabaseClient
+                    .from("usuarios")
+                    .select("*")
+                    .eq("uid", authUser.id)
+                    .maybeSingle();
+
+                if (!perfilError) perfil = perfilData;
+            } catch (_) {
+                // Si la tabla usuarios aún no existe, usamos datos del auth user.
+            }
+
+            const nombrePerfil = perfil?.nombre || authUser.user_metadata?.nombre || String(email).split("@")[0] || "Usuario";
+            const adminEmail = typeof ADMIN_EMAIL !== "undefined" ? ADMIN_EMAIL : "admin@technexus.com";
+            const esAdminPerfil = Boolean(perfil?.es_admin || perfil?.esAdmin || email === adminEmail);
+
+            usuarioActual = {
+                id: perfil?.id || authUser.id,
+                uid: authUser.id,
+                nombre: nombrePerfil,
+                email: perfil?.email || email,
+                esAdmin: esAdminPerfil,
+                es_admin: esAdminPerfil
+            };
+
+            localStorage.setItem("usuarioActual", JSON.stringify(usuarioActual));
+            localStorage.setItem("usuario", JSON.stringify(usuarioActual));
+
+            sincronizarUsuarioDataActual();
+            usuarioData.nombre = usuarioActual.nombre;
+            usuarioData.email = usuarioActual.email;
+            usuarioData.fechaRegistro = (perfil?.fecha_creacion || perfil?.fechaRegistro || new Date().toISOString()).split("T")[0];
+            guardarDatosUsuario(usuarioActual.email, usuarioData);
+
+            if (typeof cargarCarritoNube === "function") await cargarCarritoNube();
+            if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
+            if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
+
+            notificarBienvenida(usuarioActual.nombre);
+            actualizarPerfil();
+            showScreen("products");
+            return;
+        } catch (e) {
+            if (loginLocal()) {
+                notificarExito("Ingresaste con datos locales");
+                return;
+            }
+            notificarError("No se pudo conectar con el servidor de autenticación");
+            return;
+        }
     }
 
-    const usuario = usuariosRegistrados.find(u => u.email === email && u.password === password);
-    if (!usuario) {
+    if (!loginLocal()) {
         notificarError("Correo o contraseña incorrectos");
-        return;
     }
-
-    usuarioActual = { nombre: usuario.nombre, email: usuario.email, esAdmin: Boolean(usuario.esAdmin) };
-    localStorage.setItem("usuarioActual", JSON.stringify(usuarioActual));
-
-    sincronizarUsuarioDataActual();
-    usuarioData.nombre = usuario.nombre;
-    usuarioData.email = usuario.email;
-    usuarioData.fechaRegistro = (usuario.fechaRegistro || new Date().toISOString()).split("T")[0];
-    guardarDatosUsuario(usuario.email, usuarioData);
-
-    if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
-    if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
-
-    notificarBienvenida(usuario.nombre);
-    actualizarPerfil();
-    showScreen("products");
 }
 
 async function register() {
@@ -104,42 +133,51 @@ async function register() {
     }
 
     if (window.supabaseClient) {
-        const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { nombre }
-            }
-        });
-
-        if (authError) {
-            notificarError(authError.message || "No se pudo crear la cuenta");
-            return;
-        }
-
-        const uid = authData?.user?.id;
-        if (uid) {
-            await window.supabaseClient.from("usuarios").upsert({
-                uid,
-                nombre,
+        try {
+            const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
                 email,
-                es_admin: false
+                password,
+                options: {
+                    data: { nombre }
+                }
             });
-        }
 
-        // Reutiliza flujo de login para poblar sesión y carrito nube.
-        const loginEmail = document.getElementById("loginEmail");
-        const loginPassword = document.getElementById("loginPassword");
-        if (loginEmail) loginEmail.value = email;
-        if (loginPassword) loginPassword.value = password;
+            if (authError) {
+                notificarError(authError.message || "No se pudo crear la cuenta");
+                return;
+            }
 
-        if (!uid) {
-            notificarExito("Cuenta creada. Revisa tu correo para confirmar e iniciar sesión.");
+            const uid = authData?.user?.id;
+            if (uid) {
+                await window.supabaseClient.from("usuarios").upsert({
+                    uid,
+                    nombre,
+                    email,
+                    es_admin: false
+                });
+            }
+
+            if (!usuariosRegistrados.some(u => u.email === email)) {
+                usuariosRegistrados.push({ nombre, email, password, esAdmin: false, fechaRegistro: new Date().toISOString() });
+                localStorage.setItem("usuariosRegistrados", JSON.stringify(usuariosRegistrados));
+            }
+
+            // Reutiliza flujo de login para poblar sesión y carrito nube.
+            const loginEmail = document.getElementById("loginEmail");
+            const loginPassword = document.getElementById("loginPassword");
+            if (loginEmail) loginEmail.value = email;
+            if (loginPassword) loginPassword.value = password;
+
+            if (!uid) {
+                notificarExito("Cuenta creada. Revisa tu correo para confirmar e iniciar sesión.");
+                return;
+            }
+
+            await login();
             return;
+        } catch (_) {
+            // Si Supabase no responde, continuar con registro local.
         }
-
-        await login();
-        return;
     }
 
     if (usuariosRegistrados.some(u => u.email === email)) {
