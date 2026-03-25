@@ -4,7 +4,7 @@ function idsIgualesCarrito(a, b) {
 
 async function cargarCarritoNube() {
     if (!usuarioActual || !window.supabaseClient) return;
-    const usuarioId = usuarioActual.id || usuarioActual.uid;
+    const usuarioId = usuarioActual.uid || usuarioActual.id;
     if (!usuarioId) return;
 
     try {
@@ -30,7 +30,7 @@ async function cargarCarritoNube() {
 
 async function guardarCarritoNube(items = null) {
     if (!window.supabaseClient) return;
-    const usuarioId = usuarioActual?.id || usuarioActual?.uid;
+    const usuarioId = usuarioActual?.uid || usuarioActual?.id;
     if (!usuarioId) {
         console.log("⚠️ No hay usuario, no se guarda carrito");
         return;
@@ -304,7 +304,7 @@ async function comprar() {
     if (window.supabaseClient) {
         try {
             const ordenNube = {
-                usuario_id: String(usuarioActual.id || usuarioActual.uid || usuarioActual.email),
+                usuario_id: String(usuarioActual.uid || usuarioActual.id || usuarioActual.email),
                 usuario_nombre: usuarioActual.nombre,
                 usuario_email: usuarioActual.email,
                 fecha: orden.fecha,

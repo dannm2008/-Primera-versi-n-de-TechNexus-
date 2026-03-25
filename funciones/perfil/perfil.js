@@ -75,7 +75,7 @@ async function mostrarHistorialCompras() {
     }
 
     if (window.supabaseClient && (usuarioActual.id || usuarioActual.uid)) {
-        const usuarioId = String(usuarioActual.id || usuarioActual.uid);
+        const usuarioId = String(usuarioActual.uid || usuarioActual.id);
         const { data: ordenes, error } = await window.supabaseClient
             .from("ordenes")
             .select("*")

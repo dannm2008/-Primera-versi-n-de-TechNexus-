@@ -81,7 +81,7 @@ async function login() {
             const esAdminPerfil = Boolean(perfil?.es_admin || perfil?.esAdmin || email === adminEmail);
 
             usuarioActual = {
-                id: perfil?.id || authUser.id,
+                id: authUser.id,
                 uid: authUser.id,
                 nombre: nombrePerfil,
                 email: perfil?.email || email,
