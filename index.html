@@ -303,6 +303,8 @@
     <script src="funciones/autenticacion/autenticacion.js"></script>
     <script src="funciones/admin/admin.js"></script>
     <script src="funciones/avanzadas/avanzadas.js"></script>
+    <script src="funciones/favoritos/favoritos.js"></script>
+    <script src="funciones/resenas/resenas.js"></script>
     <script src="funciones/navegacion/navegacion.js"></script>
     <script src="funciones/inicio/inicio.js"></script>
 
@@ -410,13 +412,25 @@
         var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "sb_publishable_tmJzoCw-61oxem5xP855SA_0ulZY7Yd";
         window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
 
-        // Inicializar Supabase
-        var supabase = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        window.supabaseClient = supabase;
+        // Inicializar Supabase de forma segura
+        var supabase = window.supabaseClient || null;
 
-        console.log("Supabase conectado");
-        console.log("URL:", SUPABASE_URL);
-        console.log("Key:", SUPABASE_ANON_KEY.substring(0, 20) + "...");
+        try {
+            if (!supabase && window.supabase && typeof window.supabase.createClient === "function") {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                window.supabaseClient = supabase;
+            }
+        } catch (initError) {
+            console.error("Error inicializando Supabase:", initError);
+        }
+
+        if (supabase) {
+            console.log("Supabase conectado");
+            console.log("URL:", SUPABASE_URL);
+            console.log("Key:", SUPABASE_ANON_KEY.substring(0, 20) + "...");
+        } else {
+            console.error("Supabase no disponible. Revisa bloqueo de CDN/extensiones o conexión.");
+        }
 
         // Probar conexion
         async function testConexion() {
@@ -424,6 +438,11 @@
 
             try {
                 // Intentar obtener productos
+                if (!supabase) {
+                    console.log("Supabase no inicializado: se omite prueba de conexión");
+                    return;
+                }
+
                 const { data, error } = await supabase.from("productos").select("*").limit(1);
 
                 if (error) {
