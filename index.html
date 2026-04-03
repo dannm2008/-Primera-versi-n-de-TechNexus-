@@ -7,6 +7,9 @@
     <meta http-equiv="Content-Language" content="es">
     <title>TechNexus - Tienda Profesional</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
@@ -18,76 +21,69 @@
         <div class="main-content" id="mainContent">
             <div id="screen-auth" class="screen active">
                 <div class="grid-2">
-                    <div class="card">
-                        <h2>Bienvenidos a TechNexus</h2>
-                        <p>Accede a tu cuenta</p>
+                    <div class="card auth-marketing-panel">
+                        <div class="auth-brand">TechNexus</div>
+                        <h2>La base arquitectónica para inteligencia empresarial.</h2>
+                        <p>Vive un entorno digital premium donde la precisión se une al rendimiento. Gestiona tu infraestructura global con seguridad.</p>
 
-                        <div class="form-group">
-                            <label for="loginEmail">Gmail</label>
-                            <input type="email" id="loginEmail" name="loginEmail" autocomplete="email" placeholder="tu@email.com">
+                        <div class="auth-metrics">
+                            <div>
+                                <strong>99.9%</strong>
+                                <span>Disponibilidad</span>
+                            </div>
+                            <div>
+                                <strong>256-bit</strong>
+                                <span>Cifrado AES</span>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="loginPassword">Password</label>
-                            <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" placeholder="••••••••">
-                        </div>
+                    <div class="card auth-form-panel">
+                        <div class="auth-eyebrow">Acceso al sistema</div>
+                        <h2>Ingresa tus credenciales corporativas.</h2>
 
-                        <div style="text-align: right; margin-bottom: 15px;">
-                            <a href="#" onclick="mostrarRecuperarPassword()" style="color: #93C5FD; text-decoration: none; font-size: 14px;">¿Olvidaste tu contraseña?</a>
-                        </div>
-
-                        <button class="btn-primary" onclick="login()">
-                            Iniciar sesión <span>→</span>
-                        </button>
-
-                        <div style="text-align: center; margin: 15px 0; color: #999;">o continúa con</div>
-
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-outline" style="flex:1; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="socialLogin('Google')">
-                                <img src="assets/images/google-logo.png" alt="Google" style="width: 20px; height: 20px; object-fit: contain;">
+                        <div class="auth-social-row">
+                            <button class="btn-outline auth-social-btn" onclick="socialLogin('Google')">
+                                <img src="assets/images/google-logo.png" alt="Google" style="width: 18px; height: 18px; object-fit: contain;">
                                 Google
                             </button>
-                            <button class="btn-outline" style="flex:1; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="socialLogin('Apple')">
-                                <img src="assets/images/apple-logo-white.svg" alt="Apple" style="width: 20px; height: 20px; object-fit: contain;">
+                            <button class="btn-outline auth-social-btn" onclick="socialLogin('Apple')">
+                                <img src="assets/images/apple-logo-white.svg" alt="Apple" style="width: 18px; height: 18px; object-fit: contain;">
                                 Apple
                             </button>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <h2>Crear cuenta</h2>
-                        <p>Únete a la comunidad</p>
+                        <div class="auth-divider">O usa correo</div>
 
                         <div class="form-group">
-                            <label for="regName">Nombre completo</label>
-                            <input type="text" id="regName" name="regName" autocomplete="name" placeholder="Alex Tech">
+                            <label for="loginEmail">Correo corporativo</label>
+                            <input type="email" id="loginEmail" name="loginEmail" autocomplete="email" placeholder="nombre@empresa.com">
                         </div>
 
                         <div class="form-group">
-                            <label for="regEmail">Gmail</label>
-                            <input type="email" id="regEmail" name="regEmail" autocomplete="email" placeholder="alex@tech.com">
+                            <label for="loginPassword">Contraseña</label>
+                            <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" placeholder="••••••••">
                         </div>
 
-                        <div class="form-group">
-                            <label for="regPassword">Contraseña</label>
-                            <input type="password" id="regPassword" name="regPassword" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+                        <div class="auth-row">
+                            <label class="auth-remember" for="terms">
+                                <input type="checkbox" id="terms" name="terms">
+                                Mantener sesión iniciada por 30 días
+                            </label>
+                            <a href="#" onclick="mostrarRecuperarPassword()">¿Olvidaste tu contraseña?</a>
                         </div>
 
-                        <div style="display: flex; gap: 10px; margin: 15px 0;">
-                            <input type="checkbox" id="terms" name="terms">
-                            <label for="terms">Acepto términos y condiciones</label>
-                        </div>
-
-                        <button class="btn-primary" onclick="register()">
-                            Crear cuenta <span>→</span>
+                        <button class="btn-primary auth-submit" onclick="login()">
+                            Iniciar sesión segura <span>→</span>
                         </button>
-                    </div>
-                </div>
 
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 25px; color: white; margin-top: 20px;">
-                    <h3 style="font-size: 24px;">🎮 ZONA GAMERS</h3>
-                    <p style="margin: 10px 0; opacity: 0.9;">Equipamiento de alto rendimiento con RGB</p>
-                    <button class="btn-outline" style="border-color: white; color: white; margin-top: 10px;" onclick="showScreen('products')">Explorar →</button>
+                        <div class="auth-register-row">
+                            <span>¿Necesitas una cuenta corporativa?</span>
+                            <button class="btn-outline auth-register-btn" onclick="register()">Registrar empresa</button>
+                        </div>
+
+                        <div class="auth-footnote">Solo personal autorizado · IP registrada</div>
+                    </div>
                 </div>
             </div>
 
@@ -95,7 +91,21 @@
                 <h2 style="margin-bottom: 15px;">🔥 Productos destacados</h2>
                 <p style="color: #666; margin-bottom: 20px;">Lo mejor en tecnología para gaming y trabajo</p>
 
-                <div style="background: #1E293B; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 1px solid #2563EB;">
+                <div class="product-showcase">
+                    <div class="product-showcase-main card">
+                        <div class="showcase-kicker">SINCRONIZACIÓN DE TIEMPO</div>
+                        <h3>Ofertas Relámpago</h3>
+                        <p>Equipamiento premium con estética sintética, rendimiento extremo y descuentos activos por tiempo limitado.</p>
+                        <div class="showcase-price">$8,900,000 <span>$10,200,000</span></div>
+                    </div>
+                    <div class="product-showcase-side card">
+                        <div class="showcase-icon">⚡</div>
+                        <h4>Envío Instantáneo</h4>
+                        <p>Las compras de la línea Pro incluyen despacho prioritario y seguimiento en tiempo real.</p>
+                    </div>
+                </div>
+
+                <div class="toolbar-panel" style="background: #1E293B; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 1px solid #2563EB;">
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
                            <input type="text" id="searchInput" name="searchInput" placeholder="🔍 Buscar productos..."
                                style="flex: 2; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white; outline: none;"
@@ -143,7 +153,7 @@
                     </button>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 25px; margin-bottom: 30px; background: #1E293B; border-radius: 20px; padding: 20px; border: 1px solid #2563EB;">
+                <div class="profile-hero" style="display: flex; align-items: center; gap: 25px; margin-bottom: 30px; background: #1E293B; border-radius: 20px; padding: 20px; border: 1px solid #2563EB;">
                     <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">👤</div>
                     <div>
                         <h2 id="profileName" style="color: #FFFFFF; font-size: 28px;">Inicia sesión</h2>
@@ -152,7 +162,7 @@
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #2563EB; overflow-x: auto;">
+                <div class="profile-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #2563EB; overflow-x: auto;">
                     <button class="profile-tab active" onclick="mostrarSeccionPerfil('historial')" style="background: transparent; border: none; padding: 12px 24px; color: white; cursor: pointer; font-weight: 600;">📦 Historial</button>
                     <button class="profile-tab" onclick="mostrarSeccionPerfil('direcciones')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">📍 Direcciones</button>
                     <button class="profile-tab" onclick="mostrarSeccionPerfil('pagos')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">💳 <span data-i18n="payment_methods">Métodos de pago</span></button>
@@ -215,7 +225,7 @@
                     <p style="color: #666;">Precios especiales y catálogo B2B</p>
                 </div>
 
-                <div id="empresaNoRegistrada" class="card" style="text-align: center; padding: 40px;">
+                <div id="empresaNoRegistrada" class="card company-cta" style="text-align: center; padding: 40px;">
                     <div style="font-size: 60px; margin-bottom: 20px;">🏢</div>
                     <h3 style="margin-bottom: 15px;">¿Eres una empresa?</h3>
                     <p style="color: #666; margin-bottom: 25px;">
@@ -228,7 +238,7 @@
                 </div>
 
                 <div id="empresaContent" style="display: none;">
-                    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="card company-header-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <h3 style="color: white;" id="empresaNombre"></h3>

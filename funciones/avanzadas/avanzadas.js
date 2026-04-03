@@ -848,7 +848,7 @@ function suscribir(email) {
     if (!correo) return;
 
     if (suscriptores.includes(correo)) {
-        mostrarNotificacion("Ya estás suscrito", "info", "Newsletter");
+        mostrarNotificacion("Ya estás suscrito", "info", "Boletín");
         return;
     }
 
@@ -888,11 +888,11 @@ function instalarAccesosAvanzadosUI() {
         box.id = "newsletterBox";
         box.className = "newsletter-box";
         box.innerHTML = `
-            <div style="font-size: 22px;">📧 Newsletter TechNexus</div>
-            <p style="margin: 6px 0 10px; color: #94A3B8;">Recibe ofertas exclusivas y novedades</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input id="newsletterEmail" placeholder="tu@email.com" style="flex: 1; min-width: 180px; padding: 10px; border-radius: 12px; border: 1px solid #2563EB; background: #0F172A; color: white;">
-                <button class="admin-btn" onclick="suscribir(document.getElementById('newsletterEmail')?.value)">Suscribirme</button>
+            <div class="newsletter-title">📧 Boletín TechNexus</div>
+            <p class="newsletter-text">Recibe ofertas exclusivas y novedades</p>
+            <div class="newsletter-form">
+                <input id="newsletterEmail" class="newsletter-input" placeholder="tu@email.com">
+                <button class="admin-btn newsletter-button" onclick="suscribir(document.getElementById('newsletterEmail')?.value)">Suscribirme</button>
             </div>
         `;
         productsScreen.appendChild(box);
