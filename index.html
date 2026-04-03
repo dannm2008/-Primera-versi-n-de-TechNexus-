@@ -43,13 +43,17 @@
                         <h2>Ingresa tus credenciales corporativas.</h2>
 
                         <div class="auth-social-row">
-                            <button class="btn-outline auth-social-btn" onclick="socialLogin('Google')">
-                                <img src="assets/images/google-logo.png" alt="Google" style="width: 18px; height: 18px; object-fit: contain;">
-                                Google
+                            <button class="btn-outline auth-social-btn auth-social-google" onclick="socialLogin('Google')">
+                                <span class="social-icon social-icon-google" aria-hidden="true">G</span>
+                                <span>Google</span>
                             </button>
-                            <button class="btn-outline auth-social-btn" onclick="socialLogin('Apple')">
-                                <img src="assets/images/apple-logo-white.svg" alt="Apple" style="width: 18px; height: 18px; object-fit: contain;">
-                                Apple
+                            <button class="btn-outline auth-social-btn auth-social-apple" onclick="socialLogin('Apple')">
+                                <span class="social-icon social-icon-apple" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" role="img" focusable="false" aria-hidden="true">
+                                        <path fill="currentColor" d="M16.365 1.43c0 1.14-.433 2.204-1.204 2.982-.822.82-1.966 1.345-3.141 1.25-.097-1.086.413-2.192 1.18-2.943C14.05 1.84 15.25 1.34 16.365 1.43Zm4.05 16.3c-.23.52-.51 1.03-.84 1.53-.78 1.18-1.78 2.65-3.06 2.66-1.14.01-1.43-.74-2.98-.75-1.55-.01-1.88.76-3.03.75-1.28-.01-2.26-1.34-3.04-2.52C5.28 16.97 4.3 13.22 5.72 10.66c1.02-1.82 2.86-2.98 4.88-3.01 1.53-.03 2.97.81 3.9.81.93 0 2.65-1.01 4.47-.86.76.06 2.88.31 4.24 2.28-3.47 1.9-2.91 6.86-.8 8.82Z"/>
+                                    </svg>
+                                </span>
+                                <span>Apple</span>
                             </button>
                         </div>
 
