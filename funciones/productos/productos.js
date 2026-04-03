@@ -78,6 +78,8 @@ function buscarProductos() {
     const priceRange = document.getElementById("filterPrice")?.value || "todos";
 
     const productosFiltrados = productos.filter(producto => {
+        if (producto.categoria === "empresa") return false;
+
         const matchNombre = producto.nombre.toLowerCase().includes(searchTerm);
         const matchCategoria = category === "todos" || producto.categoria === category;
 
@@ -120,17 +122,17 @@ function mostrarProductosFiltrados(productosFiltrados) {
 
         html += `
             <div class="product-card">
-                <div style="font-size: 20px; text-align: center; margin-bottom: 6px;">${producto.imagen}</div>
+                ${renderProductVisual(producto.imagen, producto.nombre)}
                 <div class="product-title">${producto.nombre}</div>
-                <div style="font-size: 13px; color: #666; margin-bottom: 8px;">${producto.specs}</div>
+                <div class="product-spec">${producto.specs}</div>
                 <div class="product-price">
                     ${cuponActivo && cuponActivo.tipo === "porcentaje" ? `<span style="text-decoration: line-through; font-size: 14px; color: #999;">${formatCOP(producto.precio)}</span><br>` : ""}
                     ${formatCOP(Math.round(precioFinal))}
                 </div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
-                <div style="display: flex; gap: 8px; margin-top: 8px;">
-                    <button class="btn-outline btn-fav" data-product-id="${String(producto.id)}" style="flex:1; padding: 8px 10px;" onclick="agregarAWishlist(${idArg})">🤍 Favoritos</button>
-                    <button class="btn-outline" style="flex:1; padding: 8px 10px;" onclick="abrirModalResenas(${idArg})">⭐ Reseñas</button>
+                <div class="product-actions">
+                    <button class="btn-outline btn-fav" data-product-id="${String(producto.id)}" onclick="agregarAWishlist(${idArg})">🤍 Favoritos</button>
+                    <button class="btn-outline" onclick="abrirModalResenas(${idArg})">⭐ Reseñas</button>
                 </div>
             </div>
         `;
@@ -189,3 +191,10 @@ function aplicarCuponCarrito() {
     }
     aplicarCuponGlobal();
 }
+
+window.mostrarProductos = mostrarProductos;
+window.buscarProductos = buscarProductos;
+window.mostrarProductosFiltrados = mostrarProductosFiltrados;
+window.limpiarFiltros = limpiarFiltros;
+window.aplicarCuponGlobal = aplicarCuponGlobal;
+window.aplicarCuponCarrito = aplicarCuponCarrito;

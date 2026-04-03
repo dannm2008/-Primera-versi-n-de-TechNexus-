@@ -265,7 +265,7 @@ function adminGuardarProducto() {
     const categoria = document.getElementById("newProductCategory")?.value || "accesorios";
     const specs = (document.getElementById("newProductSpecs")?.value || "").trim();
     const stock = parseInt(document.getElementById("newProductStock")?.value || "0", 10);
-    const imagen = (document.getElementById("newProductImage")?.value || "🆕").trim();
+    const imagen = (document.getElementById("newProductImage")?.value || "assets/images/products/producto-generico.svg").trim();
 
     if (!nombre || !precio || precio <= 0) {
         notificarError("Completa los campos obligatorios");
@@ -714,12 +714,17 @@ function adminResetTienda() {
 
     productos.length = 0;
     productos.push(
-        { id: 1, nombre: "Laptop Gamer Nitro X", precio: 5200000, imagen: "💻", specs: "Intel i7 • RTX 3050 • 16GB RAM", categoria: "laptops", stock: 10 },
-        { id: 2, nombre: "Desktop Pro Gamer", precio: 8900000, imagen: "🖥️", specs: "Ryzen 9 • RTX 4080 • 32GB RAM", categoria: "desktops", stock: 5 },
-        { id: 3, nombre: "Monitor Curvo 27\"", precio: 1200000, imagen: "🖥️", specs: "240Hz • 1ms • QHD", categoria: "monitores", stock: 15 },
-        { id: 4, nombre: "Teclado Mecánico RGB", precio: 350000, imagen: "⌨️", specs: "Switches Red • RGB", categoria: "accesorios", stock: 25 },
-        { id: 5, nombre: "Mouse Gamer Pro", precio: 280000, imagen: "🖱️", specs: "26000 DPI • Inalámbrico", categoria: "accesorios", stock: 30 },
-        { id: 6, nombre: "Auriculares 7.1", precio: 450000, imagen: "🎧", specs: "Sonido envolvente • RGB", categoria: "accesorios", stock: 20 }
+        { id: 1, nombre: "Laptop Gamer Nitro X", precio: 5200000, imagen: "https://althiqa.com/wp-content/uploads/2022/06/01-16-1024x780.jpg", specs: "Intel i7 • RTX 3050 • 16GB RAM", categoria: "laptops", stock: 10 },
+        { id: 2, nombre: "Desktop Pro Gamer", precio: 8900000, imagen: "https://tse2.mm.bing.net/th/id/OIP.0xuT25C7aWMIAGyCkZ1rHAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Ryzen 9 • RTX 4080 • 32GB RAM", categoria: "desktops", stock: 5 },
+        { id: 3, nombre: "Monitor Curvo 27\"", precio: 1200000, imagen: "https://m.media-amazon.com/images/I/71Fb6HV0QbL._AC_SL1500_.jpg", specs: "240Hz • 1ms • QHD", categoria: "monitores", stock: 15 },
+        { id: 4, nombre: "Teclado Mecánico RGB", precio: 350000, imagen: "https://tse4.mm.bing.net/th/id/OIP.bPl3R1qP-Agt5mcttILp1QHaEK?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Switches Red • RGB", categoria: "accesorios", stock: 25 },
+        { id: 5, nombre: "Mouse Gamer Pro", precio: 280000, imagen: "https://i5.walmartimages.com/asr/a6aa8e6d-4658-4523-8ae3-e093c32793c1_1.04c4c6c67a78ad775bff22ee92514a7b.jpeg", specs: "26000 DPI • Inalámbrico", categoria: "accesorios", stock: 30 },
+        { id: 6, nombre: "Auriculares 7.1", precio: 450000, imagen: "https://tse3.mm.bing.net/th/id/OIP.X3iSlj7EWVPZC61zeH4C_QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Sonido envolvente • RGB", categoria: "accesorios", stock: 20 },
+        { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "assets/images/products/producto-generico.svg", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
+        { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "assets/images/products/producto-generico.svg", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
+        { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "assets/images/products/producto-generico.svg", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
+        { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "assets/images/products/producto-generico.svg", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
+        { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "assets/images/products/producto-generico.svg", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
     );
     localStorage.setItem("productos", JSON.stringify(productos));
 

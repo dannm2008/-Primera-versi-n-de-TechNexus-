@@ -83,9 +83,9 @@ function mostrarProductosEmpresa() {
         const precioConDescuento = Math.round(producto.precio * (1 - descuentoEmpresa / 100));
         html += `
             <div class="product-card">
-                <div style="font-size: 20px; text-align: center;">${producto.imagen}</div>
+                ${renderProductVisual(producto.imagen, producto.nombre)}
                 <div class="product-title">${producto.nombre}</div>
-                <div style="font-size: 13px; color: #666; margin-bottom: 8px;">${producto.specs}</div>
+                <div class="product-spec">${producto.specs}</div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <div>
                         <div style="font-size: 12px; color: #999; text-decoration: line-through;">${formatCOP(producto.precio)}</div>

@@ -9,6 +9,26 @@ function formatCOP(valor) {
     }).format(numero).replace(/\u00a0/g, " ");
 }
 
+function renderProductVisual(imagen, nombre = "Producto") {
+    const raw = String(imagen || "").trim();
+    const alt = String(nombre || "Producto");
+
+    const pareceRutaImagen = /^(https?:\/\/|\.\/|\.\.\/|\/|images\/|assets\/|data:image\/)/i.test(raw)
+        || /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(raw);
+
+    if (pareceRutaImagen) {
+        return `
+            <div class="product-media">
+                <img src="${raw}" alt="${alt}" loading="lazy" decoding="async">
+            </div>
+        `;
+    }
+
+    return `
+        <div class="product-media product-media-emoji" aria-label="${alt}">${raw || "📦"}</div>
+    `;
+}
+
 function mostrarMensaje(texto, tipo = "success") {
     if (typeof mostrarNotificacion === "function") {
         const tipoNotificacion = ["success", "error", "info", "warning", "cart", "gift"].includes(tipo)

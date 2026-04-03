@@ -520,6 +520,24 @@ async function agregarAWishlist(productoId) {
     actualizarIconosFavoritosEnProductos();
 }
 
+window.agregarResena = agregarResena;
+window.obtenerResenasProducto = obtenerResenasProducto;
+window.calcularPromedioProducto = calcularPromedioProducto;
+window.mostrarResenas = mostrarResenas;
+window.likeResena = likeResena;
+window.eliminarResena = eliminarResena;
+window.mostrarFormularioResena = mostrarFormularioResena;
+window.cerrarResenaForm = cerrarResenaForm;
+window.enviarResenaDesdeFormulario = enviarResenaDesdeFormulario;
+window.abrirModalResenas = abrirModalResenas;
+window.cerrarResenasModal = cerrarResenasModal;
+window.agregarAWishlist = agregarAWishlist;
+window.eliminarDeWishlist = eliminarDeWishlist;
+window.mostrarWishlist = mostrarWishlist;
+window.abrirWishlistModal = abrirWishlistModal;
+window.cerrarWishlistModal = cerrarWishlistModal;
+window.actualizarIconosFavoritosEnProductos = actualizarIconosFavoritosEnProductos;
+
 async function eliminarDeWishlist(productoId) {
     cargarWishlistUsuario();
     wishlist = wishlist.filter(item => !idsIguales(item.id, productoId));
@@ -555,7 +573,7 @@ function mostrarWishlist() {
         html += `
             <div class="product-card" style="position: relative;">
                 <div class="wishlist-remove" onclick="eliminarDeWishlist(${idArg})">✖</div>
-                <div style="font-size: 48px; text-align: center;">${p.imagen}</div>
+                ${renderProductVisual(p.imagen, p.nombre)}
                 <div class="product-title">${p.nombre}</div>
                 <div class="product-price">${formatCOP(Number(p.precio))}</div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
@@ -624,7 +642,7 @@ function mostrarOfertasRelampago() {
         html += `
             <div class="oferta-card">
                 <div class="oferta-badge">-${oferta.descuento}%</div>
-                <div style="font-size: 42px; text-align: center;">${producto.imagen}</div>
+                ${renderProductVisual(producto.imagen, producto.nombre)}
                 <div class="product-title">${producto.nombre}</div>
                 <div class="precio-normal">${formatCOP(Number(producto.precio))}</div>
                 <div class="precio-oferta">${formatCOP(Math.round(precioOferta))}</div>

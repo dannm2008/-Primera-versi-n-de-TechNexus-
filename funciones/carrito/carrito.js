@@ -369,3 +369,10 @@ function actualizarContadorCarrito() {
     const badge = document.getElementById("cartCount");
     if (badge) badge.textContent = String(total);
 }
+
+window.agregarAlCarrito = agregarAlCarrito;
+window.eliminarDelCarrito = eliminarDelCarrito;
+window.aumentarCantidad = aumentarCantidad;
+window.disminuirCantidad = disminuirCantidad;
+window.comprar = comprar;
+window.actualizarContadorCarrito = actualizarContadorCarrito;

@@ -220,7 +220,7 @@ async function mostrarFavoritos() {
         const idArg = JSON.stringify(p.id);
         html += `
             <div class="product-card">
-                <div style="font-size: 20px; text-align: center;">${p.imagen}</div>
+                ${renderProductVisual(p.imagen, p.nombre)}
                 <div class="product-title">${p.nombre}</div>
                 <div class="product-price">${formatCOP(p.precio)}</div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
