@@ -11,7 +11,7 @@ function mostrarZonaEmpresarial() {
         setText("empresaNit", empresa.nit || "");
         setText("empresaDescuento", `${empresa.descuento || 0}%`);
         setText("empresaCompras", String(empresa.comprasEsteMes || 0));
-        setText("empresaAhorro", `$${Number(empresa.ahorroAnual || 0).toLocaleString()}`);
+        setText("empresaAhorro", formatCOP(Number(empresa.ahorroAnual || 0)));
         setText("empresaUsuarios", String(empresa.usuarios || 1));
 
         mostrarProductosEmpresa();
@@ -88,8 +88,8 @@ function mostrarProductosEmpresa() {
                 <div style="font-size: 13px; color: #666; margin-bottom: 8px;">${producto.specs}</div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <div>
-                        <div style="font-size: 12px; color: #999; text-decoration: line-through;">$${producto.precio.toLocaleString()}</div>
-                        <div class="product-price">$${precioConDescuento.toLocaleString()}</div>
+                        <div style="font-size: 12px; color: #999; text-decoration: line-through;">${formatCOP(producto.precio)}</div>
+                        <div class="product-price">${formatCOP(precioConDescuento)}</div>
                     </div>
                     <div style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 8px; font-size: 12px; font-weight: 600;">-${descuentoEmpresa}%</div>
                 </div>

@@ -216,7 +216,7 @@ async function register() {
 }
 
 function socialLogin(provider) {
-    const email = `${String(provider).toLowerCase()}@user.com`;
+    const email = `${String(provider).toLowerCase()}@gmail.com`;
     const nombre = `Usuario ${provider}`;
 
     if (!usuariosRegistrados.some(u => u.email === email)) {

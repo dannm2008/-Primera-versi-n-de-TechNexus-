@@ -1,3 +1,14 @@
+function formatCOP(valor) {
+    const numero = Number(valor || 0);
+    return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        currencyDisplay: "code",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(numero).replace(/\u00a0/g, " ");
+}
+
 function mostrarMensaje(texto, tipo = "success") {
     if (typeof mostrarNotificacion === "function") {
         const tipoNotificacion = ["success", "error", "info", "warning", "cart", "gift"].includes(tipo)

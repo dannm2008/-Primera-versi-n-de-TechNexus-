@@ -99,7 +99,7 @@ function showAdminPanel() {
                 <div class="admin-stats">
                     <div class="admin-stat-card">
                         <div class="stat-icon">📊</div>
-                        <div class="stat-value">$${Math.round(stats.ventasMes).toLocaleString()}</div>
+                        <div class="stat-value">${formatCOP(Math.round(stats.ventasMes))}</div>
                         <div class="stat-label">Ventas este mes</div>
                     </div>
                     <div class="admin-stat-card">
@@ -198,7 +198,7 @@ function adminMostrarGraficoVentas() {
                 <div style="width: 55px; color: #94A3B8; text-transform: capitalize;">${d.nombre}</div>
                 <div style="flex: 1; background: #0F172A; border-radius: 8px; height: 30px; overflow: hidden;">
                     <div class="chart-bar" style="width: ${ancho}%; background: linear-gradient(90deg, #2563EB, #8B5CF6); margin: 0;">
-                        $${Math.round(ventas[i]).toLocaleString()}
+                        ${formatCOP(Math.round(ventas[i]))}
                     </div>
                 </div>
             </div>
@@ -219,7 +219,7 @@ function adminAgregarProducto() {
                 </div>
 
                 <div class="form-group">
-                    <label>Precio ($)</label>
+                    <label>Precio (COP)</label>
                     <input type="number" id="newProductPrice" placeholder="5200000">
                 </div>
 
@@ -300,7 +300,7 @@ function adminEditarProductos() {
             <div class="producto-edit-item">
                 <div class="producto-edit-info">
                     <strong>${p.nombre}</strong>
-                    <span>$${Number(p.precio || 0).toLocaleString()} | Stock: ${Number(p.stock || 0)}</span>
+                    <span>${formatCOP(Number(p.precio || 0))} | Stock: ${Number(p.stock || 0)}</span>
                 </div>
                 <div class="producto-edit-actions">
                     <button class="btn-edit" onclick="adminEditarProducto(${p.id})" aria-label="Editar ${p.nombre}" title="Editar">✏️</button>
@@ -424,7 +424,7 @@ function adminVerPedidos() {
                 <td>${new Date(p.fecha).toLocaleDateString()}</td>
                 <td><strong>${p.usuarioNombre || p.usuarioEmail || p.usuario || "Cliente"}</strong><br><span style="font-size: 11px;">${p.usuarioEmail || p.usuario || ""}</span></td>
                 <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${productosLista}</td>
-                <td>$${Number(p.total || 0).toLocaleString()}</td>
+                <td>${formatCOP(Number(p.total || 0))}</td>
                 <td>
                     <select onchange="adminCambiarEstado(${p.id}, this.value)" style="background: #0F172A; color: white; border: 1px solid #2563EB; padding: 4px 8px; border-radius: 8px;">
                         <option value="pendiente" ${p.estado === "pendiente" ? "selected" : ""}>pendiente</option>
@@ -476,7 +476,7 @@ function adminVerDetallePedido(ordenId) {
         itemsHtml += `
             <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2563EB;">
                 <span>${item.nombre} x${item.cantidad}</span>
-                <span>$${Math.round((item.precio || 0) * (item.cantidad || 1)).toLocaleString()}</span>
+                <span>${formatCOP(Math.round((item.precio || 0) * (item.cantidad || 1)))}</span>
             </div>
         `;
     });
@@ -507,7 +507,7 @@ function adminVerDetallePedido(ordenId) {
                 <div style="background: #0F172A; border-radius: 12px; padding: 15px;">
                     <div style="display: flex; justify-content: space-between; font-size: 18px;">
                         <strong>Total</strong>
-                        <strong>$${Number(pedido.total || 0).toLocaleString()}</strong>
+                        <strong>${formatCOP(Number(pedido.total || 0))}</strong>
                     </div>
                 </div>
 
@@ -585,7 +585,7 @@ function adminCrearCupon() {
                     <label>Tipo de descuento</label>
                     <select id="cuponTipo">
                         <option value="porcentaje">Porcentaje (%)</option>
-                        <option value="fijo">Monto fijo ($)</option>
+                        <option value="fijo">Monto fijo (COP)</option>
                     </select>
                 </div>
 
@@ -667,7 +667,7 @@ function adminVerReportes() {
                 <div class="admin-stats" style="grid-template-columns: 1fr 1fr;">
                     <div class="admin-stat-card">
                         <div class="stat-icon">💰</div>
-                        <div class="stat-value">$${Math.round(ventasTotales).toLocaleString()}</div>
+                        <div class="stat-value">${formatCOP(Math.round(ventasTotales))}</div>
                         <div class="stat-label">Ventas totales</div>
                     </div>
                     <div class="admin-stat-card">

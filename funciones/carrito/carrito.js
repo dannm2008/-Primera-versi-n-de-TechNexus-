@@ -204,7 +204,7 @@ function mostrarCarrito() {
             <div class="cart-item">
                 <div class="cart-item-info">
                     <h4>${item.nombre}</h4>
-                    <div class="cart-item-price">$${item.precio.toLocaleString()}</div>
+                    <div class="cart-item-price">${formatCOP(item.precio)}</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div class="cart-quantity">
@@ -238,12 +238,12 @@ function mostrarCarrito() {
     container.innerHTML = `
         ${itemsHtml}
         <div class="cart-summary">
-            <div class="summary-row"><span>Subtotal</span><span>$${subtotal.toLocaleString()}</span></div>
-            ${cuponActivo ? `<div class="summary-row" style="color: #4ade80;"><span>Descuento (${cuponActivo.codigo})</span><span>-$${Math.round(descuento).toLocaleString()}</span></div>` : ""}
-            ${descuentoNivel > 0 ? `<div class="summary-row" style="color: #facc15;"><span>Beneficio por nivel</span><span>-$${Math.round(descuentoNivel).toLocaleString()}</span></div>` : ""}
-            ${descuentoPuntos > 0 ? `<div class="summary-row" style="color: #a78bfa;"><span>Canje de puntos</span><span>-$${Math.round(descuentoPuntos).toLocaleString()}</span></div>` : ""}
-            <div class="summary-row"><span>Envío</span><span>${envio === 0 ? "Gratis" : "$" + envio.toLocaleString()}</span></div>
-            <div class="summary-total"><span>Total</span><span>$${Math.round(total).toLocaleString()}</span></div>
+            <div class="summary-row"><span>Subtotal</span><span>${formatCOP(subtotal)}</span></div>
+            ${cuponActivo ? `<div class="summary-row" style="color: #4ade80;"><span>Descuento (${cuponActivo.codigo})</span><span>-${formatCOP(Math.round(descuento))}</span></div>` : ""}
+            ${descuentoNivel > 0 ? `<div class="summary-row" style="color: #facc15;"><span>Beneficio por nivel</span><span>-${formatCOP(Math.round(descuentoNivel))}</span></div>` : ""}
+            ${descuentoPuntos > 0 ? `<div class="summary-row" style="color: #a78bfa;"><span>Canje de puntos</span><span>-${formatCOP(Math.round(descuentoPuntos))}</span></div>` : ""}
+            <div class="summary-row"><span>Envío</span><span>${envio === 0 ? "Gratis" : formatCOP(envio)}</span></div>
+            <div class="summary-total"><span>Total</span><span>${formatCOP(Math.round(total))}</span></div>
             ${!cuponActivo ? `<div style="margin-top: 15px;"><div style="display: flex; gap: 10px;"><input type="text" id="codigoCuponCarrito" placeholder="Codigo cupon" style="flex:1; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white;"><button class="btn-outline" onclick="aplicarCuponCarrito()">Aplicar</button></div></div>` : ""}
         </div>
         <button class="btn-primary" onclick="comprar()" style="margin-top: 20px;">Proceder al pago</button>

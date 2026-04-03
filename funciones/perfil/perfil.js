@@ -52,7 +52,7 @@ function renderHistorialLocal(container) {
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">${(orden.productos || []).map(p => `<span style="background: #0F172A; padding: 6px 12px; border-radius: 20px; font-size: 13px; color: white;">${p}</span>`).join("")}</div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                    <span style="color: #8B5CF6; font-weight: 700;">$${Number(orden.total || 0).toLocaleString()}</span>
+                    <span style="color: #8B5CF6; font-weight: 700;">${formatCOP(Number(orden.total || 0))}</span>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         <button class="btn-outline" onclick="recomprar(${idArg})" style="padding: 6px 16px; font-size: 13px;">Comprar de nuevo</button>
                         <button class="btn-outline" onclick="generarFactura(${idArg})" style="padding: 6px 16px; font-size: 13px;">Factura</button>
@@ -127,7 +127,7 @@ async function mostrarHistorialCompras() {
                             ${itemsHtml}
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: #8B5CF6; font-weight: 700;">$${Number(orden.total || 0).toLocaleString()}</span>
+                            <span style="color: #8B5CF6; font-weight: 700;">${formatCOP(Number(orden.total || 0))}</span>
                             <button class="btn-outline" onclick="recomprar(${idArg})" style="padding: 6px 16px; font-size: 13px;">Comprar de nuevo</button>
                         </div>
                     </div>
@@ -222,7 +222,7 @@ async function mostrarFavoritos() {
             <div class="product-card">
                 <div style="font-size: 20px; text-align: center;">${p.imagen}</div>
                 <div class="product-title">${p.nombre}</div>
-                <div class="product-price">$${p.precio.toLocaleString()}</div>
+                <div class="product-price">${formatCOP(p.precio)}</div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
                 <button class="btn-outline" onclick="quitarFavorito(${idArg})" style="margin-top: 8px; width: 100%;">❤️ Quitar</button>
             </div>

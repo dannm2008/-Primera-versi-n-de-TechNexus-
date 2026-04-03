@@ -557,7 +557,7 @@ function mostrarWishlist() {
                 <div class="wishlist-remove" onclick="eliminarDeWishlist(${idArg})">✖</div>
                 <div style="font-size: 48px; text-align: center;">${p.imagen}</div>
                 <div class="product-title">${p.nombre}</div>
-                <div class="product-price">$${Number(p.precio).toLocaleString()}</div>
+                <div class="product-price">${formatCOP(Number(p.precio))}</div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
             </div>
         `;
@@ -626,8 +626,8 @@ function mostrarOfertasRelampago() {
                 <div class="oferta-badge">-${oferta.descuento}%</div>
                 <div style="font-size: 42px; text-align: center;">${producto.imagen}</div>
                 <div class="product-title">${producto.nombre}</div>
-                <div class="precio-normal">$${Number(producto.precio).toLocaleString()}</div>
-                <div class="precio-oferta">$${Math.round(precioOferta).toLocaleString()}</div>
+                <div class="precio-normal">${formatCOP(Number(producto.precio))}</div>
+                <div class="precio-oferta">${formatCOP(Math.round(precioOferta))}</div>
                 <div class="stock-limitado">⚠️ Solo ${disponibles} disponibles</div>
                 <div class="contador" data-expiracion="${oferta.expiracion}"></div>
                 <button class="btn-add" onclick="comprarOferta(${oferta.id}, ${JSON.stringify(producto.id)})">Comprar ahora</button>
@@ -681,11 +681,11 @@ Cliente: ${usuarioActual.nombre}
 Email: ${usuarioActual.email}
 ------------------------------------
 PRODUCTOS:
-${items.map(item => `  ${item.nombre} x${item.cantidad} = $${(Number(item.precio || 0) * Number(item.cantidad || 1)).toLocaleString()}`).join("\n")}
+${items.map(item => `  ${item.nombre} x${item.cantidad} = ${formatCOP(Number(item.precio || 0) * Number(item.cantidad || 1))}`).join("\n")}
 ------------------------------------
-Subtotal: $${subtotal.toLocaleString()}
-Envío: ${envio === 0 ? "Gratis" : "$" + envio.toLocaleString()}
-TOTAL: $${total.toLocaleString()}
+Subtotal: ${formatCOP(subtotal)}
+Envío: ${envio === 0 ? "Gratis" : formatCOP(envio)}
+TOTAL: ${formatCOP(total)}
 ------------------------------------
 Método de pago: ${orden.metodoPago || "Pendiente"}
 Estado: ${orden.estado || "pendiente"}
@@ -736,11 +736,11 @@ REPORTE DE VENTAS - TECHNEXUS
 ====================================
 Fecha generación: ${new Date().toLocaleString()}
 Total pedidos: ${historialGlobal.length}
-Total ventas: $${historialGlobal.reduce((sum, o) => sum + Number(o.total || 0), 0).toLocaleString()}
+Total ventas: ${formatCOP(historialGlobal.reduce((sum, o) => sum + Number(o.total || 0), 0))}
 ====================================
 
 VENTAS POR MES:
-${Object.entries(ventasPorMes).map(([mes, total]) => `  ${mes}: $${total.toLocaleString()}`).join("\n")}
+${Object.entries(ventasPorMes).map(([mes, total]) => `  ${mes}: ${formatCOP(total)}`).join("\n")}
 
 ====================================
 PRODUCTOS MÁS VENDIDOS:

@@ -72,7 +72,7 @@ function notificarCuponAplicado(codigo, descripcion) {
 }
 
 function notificarCompraExitosa(total) {
-    mostrarNotificacion(`Compra realizada por $${Math.round(total).toLocaleString()}`, "success", "🎉 Compra exitosa");
+    mostrarNotificacion(`Compra realizada por ${formatCOP(Math.round(total))}`, "success", "🎉 Compra exitosa");
 }
 
 function notificarOferta(productoNombre, descuento) {

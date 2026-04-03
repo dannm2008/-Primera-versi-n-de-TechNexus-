@@ -124,8 +124,8 @@ function mostrarProductosFiltrados(productosFiltrados) {
                 <div class="product-title">${producto.nombre}</div>
                 <div style="font-size: 13px; color: #666; margin-bottom: 8px;">${producto.specs}</div>
                 <div class="product-price">
-                    ${cuponActivo && cuponActivo.tipo === "porcentaje" ? `<span style="text-decoration: line-through; font-size: 14px; color: #999;">$${producto.precio.toLocaleString()}</span><br>` : ""}
-                    $${Math.round(precioFinal).toLocaleString()}
+                    ${cuponActivo && cuponActivo.tipo === "porcentaje" ? `<span style="text-decoration: line-through; font-size: 14px; color: #999;">${formatCOP(producto.precio)}</span><br>` : ""}
+                    ${formatCOP(Math.round(precioFinal))}
                 </div>
                 <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
                 <div style="display: flex; gap: 8px; margin-top: 8px;">
@@ -169,7 +169,7 @@ function aplicarCuponGlobal() {
     const cuponBox = document.getElementById("cuponActivo");
     const descripcion = cupon.tipo === "porcentaje"
         ? `${cupon.descuento}% de descuento`
-        : `$${cupon.descuento.toLocaleString()} de descuento`;
+        : `${formatCOP(cupon.descuento)} de descuento`;
 
     if (cuponBox) {
         cuponBox.style.display = "block";
