@@ -257,6 +257,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         sincronizarUsuarioDataActual();
     }
 
+    if (usuarioActual) {
+        const ultimaPantalla = localStorage.getItem("ultimaPantalla") || "products";
+        showScreen(ultimaPantalla);
+    } else {
+        showScreen("auth");
+    }
+
     mostrarProductos();
     actualizarContadorCarrito();
     if (typeof cargarCarritoNube === "function") await cargarCarritoNube();

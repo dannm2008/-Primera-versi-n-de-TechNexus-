@@ -274,10 +274,15 @@ function migrarPerfilLegacyAUsuariosData() {
 
 migrarPerfilLegacyAUsuariosData();
 
-// Seguridad: no restauramos sesión automáticamente al recargar.
-// El acceso a historial/notificaciones requiere iniciar sesión de nuevo.
-usuarioActual = null;
+// Restaurar sesión guardada para mantener al usuario logueado tras recargar.
+let sesionGuardada = null;
+try {
+    sesionGuardada = JSON.parse(localStorage.getItem("usuarioActual") || localStorage.getItem("usuario") || "null");
+} catch (_err) {
+    sesionGuardada = null;
+}
 
+usuarioActual = (sesionGuardada && sesionGuardada.email) ? sesionGuardada : null;
 window.usuarioActual = usuarioActual;
 
 function guardarUsuarioData() {

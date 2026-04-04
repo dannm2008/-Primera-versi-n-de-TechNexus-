@@ -1,4 +1,15 @@
+function actualizarNavegacionSesion() {
+    const navAuthItem = document.getElementById("navAuthItem");
+    if (!navAuthItem) return;
+
+    navAuthItem.style.display = usuarioActual ? "none" : "flex";
+}
+
 function showScreen(screenId) {
+    if (screenId === "auth" && usuarioActual) {
+        screenId = localStorage.getItem("ultimaPantalla") || "products";
+    }
+
     const requiereSesion = ["cart", "profile", "empresa"].includes(screenId);
     if (requiereSesion && !usuarioActual) {
         notificarError("Inicia sesión para acceder a esta sección");
@@ -15,6 +26,12 @@ function showScreen(screenId) {
     const target = document.getElementById(`screen-${screenId}`);
     if (target) target.classList.add("active");
 
+    if (usuarioActual && screenId !== "auth") {
+        localStorage.setItem("ultimaPantalla", screenId);
+    }
+
+    actualizarNavegacionSesion();
+
     const index = { auth: 0, products: 1, cart: 2, empresa: 3, profile: 4 };
     const navItems = document.querySelectorAll(".nav-item");
     if (navItems[index[screenId]]) navItems[index[screenId]].classList.add("active");
@@ -24,3 +41,5 @@ function showScreen(screenId) {
     if (screenId === "profile") actualizarPerfil();
     if (screenId === "empresa") mostrarZonaEmpresarial();
 }
+
+window.actualizarNavegacionSesion = actualizarNavegacionSesion;

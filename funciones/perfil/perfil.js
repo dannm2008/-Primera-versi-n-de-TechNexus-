@@ -551,6 +551,8 @@ function cerrarSesion() {
     usuarioActual = null;
     localStorage.removeItem("usuarioActual");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("ultimaPantalla");
+    if (typeof limpiarCamposAuth === "function") limpiarCamposAuth();
 
     if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
     if (typeof mostrarCarrito === "function") mostrarCarrito();

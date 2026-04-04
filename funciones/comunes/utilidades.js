@@ -10,11 +10,17 @@ function formatCOP(valor) {
 }
 
 function renderProductVisual(imagen, nombre = "Producto") {
-    const raw = String(imagen || "").trim();
-    const alt = String(nombre || "Producto");
-    const srcFinal = raw.startsWith("assets/images/sin-fondo/")
-        ? `${raw}${raw.includes("?") ? "&" : "?"}v=20260403b`
-        : raw;
+    const raw = String(imagen || "").trim().replace(/^['\"]+|['\"]+$/g, "");
+    const alt = String(nombre || "Producto").replace(/[&<>\"]/g, ch => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;"
+    }[ch] || ch));
+    const srcLimpio = raw.replace(/\s+/g, " ").trim();
+    const srcFinal = srcLimpio.startsWith("assets/images/sin-fondo/")
+        ? `${srcLimpio}${srcLimpio.includes("?") ? "&" : "?"}v=20260403b`
+        : srcLimpio;
 
     const pareceRutaImagen = /^(https?:\/\/|\.\/|\.\.\/|\/|images\/|assets\/|data:image\/)/i.test(srcFinal)
         || /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(srcFinal);

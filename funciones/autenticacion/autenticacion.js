@@ -1,9 +1,15 @@
 async function login() {
     const email = (document.getElementById("loginEmail")?.value || "").trim().toLowerCase();
     const password = (document.getElementById("loginPassword")?.value || "").trim();
+    const emailValido = email.includes("@") && email.includes(".") && !email.startsWith("@") && !email.endsWith(".");
 
     if (!email || !password) {
         notificarError("Completa todos los campos");
+        return;
+    }
+
+    if (!emailValido) {
+        notificarError("Correo inválido. Usa formato tipo usuario@gmail.com");
         return;
     }
 
@@ -23,12 +29,34 @@ async function login() {
         if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
         if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
         if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
+        if (typeof limpiarCamposAuth === "function") limpiarCamposAuth();
 
         notificarBienvenida(usuario.nombre);
         actualizarPerfil();
         showScreen("products");
         return true;
     };
+
+    const usuarioLocalPorEmail = usuariosRegistrados.find(
+        u => String(u.email || "").trim().toLowerCase() === email
+    );
+
+    // Si el correo existe localmente, no consultamos Supabase para evitar 400 innecesarios.
+    if (usuarioLocalPorEmail) {
+        if (loginLocal()) {
+            notificarExito("Ingresaste correctamente");
+            return;
+        }
+
+        notificarError("Contraseña incorrecta para esta cuenta");
+        return;
+    }
+
+    // Primero intenta login local para evitar 400 innecesarios en cuentas creadas localmente.
+    if (loginLocal()) {
+        notificarExito("Ingresaste correctamente");
+        return;
+    }
 
     // Prioriza Supabase Auth cuando está disponible.
     if (window.supabaseClient) {
@@ -113,6 +141,7 @@ async function login() {
             if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
             if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
             if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
+            if (typeof limpiarCamposAuth === "function") limpiarCamposAuth();
 
             notificarBienvenida(usuarioActual.nombre);
             actualizarPerfil();
@@ -141,11 +170,37 @@ async function register() {
     const email = emailInput;
     const password = passwordInput;
     const terms = !!document.getElementById("terms")?.checked;
+    const emailValido = email.includes("@") && email.includes(".") && !email.startsWith("@") && !email.endsWith(".");
 
     if (!nombre || !email || !password || !terms) {
         notificarError("Ingresa Gmail y contraseña, y acepta términos para crear la cuenta");
         return;
     }
+
+    if (!emailValido) {
+        notificarError("El correo electrónico no es válido");
+        return;
+    }
+
+    if (password.length < 6) {
+        notificarError("La contraseña debe tener al menos 6 caracteres");
+        return;
+    }
+
+    if (usuariosRegistrados.some(u => String(u.email || "").trim().toLowerCase() === email)) {
+        notificarError("Este correo ya está registrado");
+        return;
+    }
+
+    // PASO 1: Siempre guardar localmente PRIMERO
+    const nuevoUsuario = { nombre, email, password, esAdmin: false, fechaRegistro: new Date().toISOString() };
+    usuariosRegistrados.push(nuevoUsuario);
+    localStorage.setItem("usuariosRegistrados", JSON.stringify(usuariosRegistrados));
+    console.log("✅ Cuenta guardada localmente:", email, usuariosRegistrados);
+
+    // PASO 2: Intentar Supabase (pero sin bloquear si falla)
+    let supabaseUid = null;
+    let sesionSupabaseActiva = false;
 
     if (window.supabaseClient) {
         try {
@@ -163,65 +218,51 @@ async function register() {
                     notificarError("Demasiados intentos de registro. Espera unos segundos");
                     return;
                 }
-                notificarError(authError.message || "No se pudo crear la cuenta");
-                return;
+                console.warn("⚠️ Supabase signUp falló (continuamos local):", authError.message);
+            } else {
+                supabaseUid = authData?.user?.id;
+                sesionSupabaseActiva = Boolean(authData?.session?.access_token);
+                console.log("✅ Supabase signUp exitoso. UID:", supabaseUid, "Sesión activa:", sesionSupabaseActiva);
+
+                if (supabaseUid) {
+                    await window.supabaseClient.from("usuarios").upsert({
+                        uid: supabaseUid,
+                        nombre,
+                        email,
+                        es_admin: false
+                    });
+                }
             }
-
-            const uid = authData?.user?.id;
-            if (uid) {
-                await window.supabaseClient.from("usuarios").upsert({
-                    uid,
-                    nombre,
-                    email,
-                    es_admin: false
-                });
-            }
-
-            if (!usuariosRegistrados.some(u => String(u.email || "").trim().toLowerCase() === email)) {
-                usuariosRegistrados.push({ nombre, email, password, esAdmin: false, fechaRegistro: new Date().toISOString() });
-                localStorage.setItem("usuariosRegistrados", JSON.stringify(usuariosRegistrados));
-            }
-
-            // Reutiliza flujo de login para poblar sesión y carrito nube.
-            const loginEmail = document.getElementById("loginEmail");
-            const loginPassword = document.getElementById("loginPassword");
-            if (loginEmail) loginEmail.value = email;
-            if (loginPassword) loginPassword.value = password;
-
-            if (!uid) {
-                notificarExito("Cuenta creada. Revisa tu correo para confirmar e iniciar sesión.");
-                return;
-            }
-
-            await login();
-            return;
-        } catch (_) {
-            // Si Supabase no responde, continuar con registro local.
+        } catch (e) {
+            console.error("❌ Error conectando con Supabase:", e.message);
         }
     }
 
-    if (usuariosRegistrados.some(u => String(u.email || "").trim().toLowerCase() === email)) {
-        notificarError("Este correo ya está registrado");
-        return;
-    }
-
-    const nuevo = { nombre, email, password, esAdmin: false, fechaRegistro: new Date().toISOString() };
-    usuariosRegistrados.push(nuevo);
-    localStorage.setItem("usuariosRegistrados", JSON.stringify(usuariosRegistrados));
-
-    usuarioActual = { nombre, email, esAdmin: false };
+    // PASO 3: Iniciar sesión local
+    usuarioActual = {
+        id: supabaseUid || email,
+        uid: supabaseUid || "",
+        nombre,
+        email,
+        esAdmin: false,
+        es_admin: false
+    };
     localStorage.setItem("usuarioActual", JSON.stringify(usuarioActual));
+    localStorage.setItem("usuario", JSON.stringify(usuarioActual));
 
-    usuarioData = crearEstructuraUsuarioBase(email, nombre);
-    usuarioData.fechaRegistro = new Date().toISOString().split("T")[0];
+    sincronizarUsuarioDataActual();
+    usuarioData.nombre = nombre;
+    usuarioData.email = email;
+    if (!usuarioData.fechaRegistro) usuarioData.fechaRegistro = new Date().toISOString().split("T")[0];
     guardarDatosUsuario(email, usuarioData);
 
     if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
     if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
     if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
+    if (typeof limpiarCamposAuth === "function") limpiarCamposAuth();
 
     notificarBienvenida(nombre);
-    notificarExito("Cuenta creada exitosamente");
+    notificarExito("✅ Cuenta creada exitosamente. Ya puedes usar la app.");
     actualizarPerfil();
     showScreen("products");
 }
@@ -247,11 +288,30 @@ function socialLogin(provider) {
     if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
     if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
     if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
+    if (typeof limpiarCamposAuth === "function") limpiarCamposAuth();
 
     notificarBienvenida(nombre);
     actualizarPerfil();
     showScreen("products");
 }
+
+function limpiarCamposAuth() {
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const regName = document.getElementById("regName");
+    const regEmail = document.getElementById("regEmail");
+    const regPassword = document.getElementById("regPassword");
+    const terms = document.getElementById("terms");
+
+    if (loginEmail) loginEmail.value = "";
+    if (loginPassword) loginPassword.value = "";
+    if (regName) regName.value = "";
+    if (regEmail) regEmail.value = "";
+    if (regPassword) regPassword.value = "";
+    if (terms) terms.checked = false;
+}
+
+window.limpiarCamposAuth = limpiarCamposAuth;
 
 function mostrarRecuperarPassword() {
     const modalHtml = `
