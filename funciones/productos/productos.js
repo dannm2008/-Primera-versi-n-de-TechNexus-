@@ -2,9 +2,36 @@ let ultimaCargaProductos = Array.isArray(productos) && productos.length ? Date.n
 let cargaProductosEnCurso = null;
 const CACHE_PRODUCTOS_MS = 30000;
 
+const idsCanonicosPorNombre = {
+    "laptop gamer nitro x": 1,
+    "desktop pro gamer": 2,
+    "monitor curvo 27\"": 3,
+    "teclado mecánico rgb": 4,
+    "teclado mecanico rgb": 4,
+    "mouse gamer pro": 5,
+    "auriculares 7.1": 6,
+    "workstation empresarial z9": 101,
+    "servidor rack mini 8 bahías": 102,
+    "servidor rack mini 8 bahias": 102,
+    "laptop ejecutiva carbon pro 14": 103,
+    "kit videoconferencia 4k team": 104,
+    "firewall corporativo securegate x": 105
+};
+
+function resolverIdCanonicoSupabase(producto) {
+    const nombre = String(producto?.nombre || "").trim().toLowerCase();
+    const idDirecto = Number(producto?.id);
+
+    if (Number.isInteger(idDirecto) && idDirecto > 0) return idDirecto;
+    if (idsCanonicosPorNombre[nombre]) return idsCanonicosPorNombre[nombre];
+
+    return String(producto?.id || "").trim() || Date.now();
+}
+
 function normalizarProductoSupabase(producto) {
-    return {
-        id: String(producto.id),
+    const id = resolverIdCanonicoSupabase(producto);
+    const base = {
+        id,
         nombre: producto.nombre || "Producto sin nombre",
         precio: Number(producto.precio || 0),
         imagen: producto.imagen || "📦",
@@ -12,6 +39,12 @@ function normalizarProductoSupabase(producto) {
         categoria: producto.categoria || "accesorios",
         stock: Number(producto.stock || 0)
     };
+
+    if (typeof normalizarImagenProducto === "function") {
+        base.imagen = normalizarImagenProducto(base);
+    }
+
+    return base;
 }
 
 async function cargarProductosDesdeSupabase(force = false) {
@@ -129,10 +162,10 @@ function mostrarProductosFiltrados(productosFiltrados) {
                     ${cuponActivo && cuponActivo.tipo === "porcentaje" ? `<span style="text-decoration: line-through; font-size: 14px; color: #999;">${formatCOP(producto.precio)}</span><br>` : ""}
                     ${formatCOP(Math.round(precioFinal))}
                 </div>
-                <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
+                <button class="btn-add" onclick='agregarAlCarrito(${idArg})'>Agregar +</button>
                 <div class="product-actions">
-                    <button class="btn-outline btn-fav" data-product-id="${String(producto.id)}" onclick="agregarAWishlist(${idArg})">🤍 Favoritos</button>
-                    <button class="btn-outline" onclick="abrirModalResenas(${idArg})">⭐ Reseñas</button>
+                    <button class="btn-outline btn-fav" data-product-id="${String(producto.id)}" onclick='agregarAWishlist(${idArg})'>🤍 Favoritos</button>
+                    <button class="btn-outline" onclick='abrirModalResenas(${idArg})'>⭐ Reseñas</button>
                 </div>
             </div>
         `;

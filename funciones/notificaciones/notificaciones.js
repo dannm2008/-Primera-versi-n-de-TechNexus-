@@ -1,5 +1,30 @@
 // ========== SISTEMA DE NOTIFICACIONES ==========
 
+function traducirMensajeSistema(mensaje) {
+    const texto = String(mensaje || "").trim();
+    if (!texto) return "";
+
+    const normalizado = texto.toLowerCase();
+
+    const reglas = [
+        { test: /invalid login credentials/i, value: "Credenciales inválidas" },
+        { test: /email not confirmed|confirm/i, value: "Debes confirmar tu correo para iniciar sesión" },
+        { test: /too many|rate limit|429/i, value: "Demasiados intentos. Espera unos segundos e inténtalo de nuevo" },
+        { test: /user already registered|already registered/i, value: "Este correo ya está registrado" },
+        { test: /invalid email|email address/i, value: "El correo electrónico no es válido" },
+        { test: /password should be at least|min(imum)?\s*\d+\s*characters/i, value: "La contraseña no cumple con los requisitos mínimos" },
+        { test: /network|fetch failed|failed to fetch|network request failed|timeout/i, value: "Error de conexión. Verifica tu internet e inténtalo de nuevo" },
+        { test: /jwt|token|session/i, value: "Tu sesión expiró. Inicia sesión de nuevo" },
+        { test: /permission denied|not authorized|unauthorized|forbidden|insufficient privileges|row-level security|rls/i, value: "No tienes permisos para realizar esta acción" }
+    ];
+
+    for (const regla of reglas) {
+        if (regla.test.test(normalizado)) return regla.value;
+    }
+
+    return texto;
+}
+
 function getNotificationContainer() {
     let container = document.querySelector(".notification-container");
     if (!container) {
@@ -12,12 +37,13 @@ function getNotificationContainer() {
 
 function mostrarNotificacion(mensaje, tipo = "success", titulo = "") {
     const container = getNotificationContainer();
+    const mensajeTraducido = traducirMensajeSistema(mensaje);
 
     const config = {
-        success: { icon: "✅", titulo: titulo || "Exito" },
+        success: { icon: "✅", titulo: titulo || "Éxito" },
         error: { icon: "❌", titulo: titulo || "Error" },
-        info: { icon: "ℹ️", titulo: titulo || "Informacion" },
-        warning: { icon: "⚠️", titulo: titulo || "Atencion" },
+        info: { icon: "ℹ️", titulo: titulo || "Información" },
+        warning: { icon: "⚠️", titulo: titulo || "Atención" },
         cart: { icon: "🛒", titulo: titulo || "Carrito" },
         gift: { icon: "🎁", titulo: titulo || "Oferta" }
     };
@@ -29,7 +55,7 @@ function mostrarNotificacion(mensaje, tipo = "success", titulo = "") {
         <div class="notification-icon">${cfg.icon}</div>
         <div class="notification-content">
             <div class="notification-title">${cfg.titulo}</div>
-            <div class="notification-message">${mensaje}</div>
+            <div class="notification-message">${mensajeTraducido}</div>
         </div>
         <div class="notification-close" onclick="cerrarNotificacion(this)">✖</div>
     `;

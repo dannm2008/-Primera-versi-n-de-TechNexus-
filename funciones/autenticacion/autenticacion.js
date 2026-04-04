@@ -1,5 +1,5 @@
 async function login() {
-    const email = (document.getElementById("loginEmail")?.value || "").trim();
+    const email = (document.getElementById("loginEmail")?.value || "").trim().toLowerCase();
     const password = (document.getElementById("loginPassword")?.value || "").trim();
 
     if (!email || !password) {
@@ -8,7 +8,7 @@ async function login() {
     }
 
     const loginLocal = () => {
-        const usuario = usuariosRegistrados.find(u => u.email === email && u.password === password);
+        const usuario = usuariosRegistrados.find(u => String(u.email || "").trim().toLowerCase() === email && String(u.password || "") === password);
         if (!usuario) return false;
 
         usuarioActual = { nombre: usuario.nombre, email: usuario.email, esAdmin: Boolean(usuario.esAdmin) };
@@ -21,6 +21,7 @@ async function login() {
         guardarDatosUsuario(usuario.email, usuarioData);
 
         if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
+        if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
         if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
 
         notificarBienvenida(usuario.nombre);
@@ -51,6 +52,11 @@ async function login() {
 
                 if (errMsg.includes("email not confirmed") || errMsg.includes("confirm")) {
                     notificarError("Debes confirmar tu correo para iniciar sesión en Supabase");
+                    return;
+                }
+
+                if (errMsg.includes("invalid login credentials")) {
+                    notificarError("Credenciales inválidas. Si no tienes cuenta, pulsa Crear cuenta primero");
                     return;
                 }
 
@@ -105,6 +111,7 @@ async function login() {
 
             if (typeof cargarCarritoNube === "function") await cargarCarritoNube();
             if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
+            if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
             if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
 
             notificarBienvenida(usuarioActual.nombre);
@@ -127,13 +134,16 @@ async function login() {
 }
 
 async function register() {
-    const nombre = (document.getElementById("regName")?.value || "").trim();
-    const email = (document.getElementById("regEmail")?.value || "").trim();
-    const password = (document.getElementById("regPassword")?.value || "").trim();
+    const nombreInput = (document.getElementById("regName")?.value || "").trim();
+    const emailInput = (document.getElementById("regEmail")?.value || document.getElementById("loginEmail")?.value || "").trim().toLowerCase();
+    const passwordInput = (document.getElementById("regPassword")?.value || document.getElementById("loginPassword")?.value || "").trim();
+    const nombre = nombreInput || String(emailInput).split("@")[0] || "Usuario";
+    const email = emailInput;
+    const password = passwordInput;
     const terms = !!document.getElementById("terms")?.checked;
 
     if (!nombre || !email || !password || !terms) {
-        notificarError("Completa todo y acepta términos");
+        notificarError("Ingresa Gmail y contraseña, y acepta términos para crear la cuenta");
         return;
     }
 
@@ -167,7 +177,7 @@ async function register() {
                 });
             }
 
-            if (!usuariosRegistrados.some(u => u.email === email)) {
+            if (!usuariosRegistrados.some(u => String(u.email || "").trim().toLowerCase() === email)) {
                 usuariosRegistrados.push({ nombre, email, password, esAdmin: false, fechaRegistro: new Date().toISOString() });
                 localStorage.setItem("usuariosRegistrados", JSON.stringify(usuariosRegistrados));
             }
@@ -190,7 +200,7 @@ async function register() {
         }
     }
 
-    if (usuariosRegistrados.some(u => u.email === email)) {
+    if (usuariosRegistrados.some(u => String(u.email || "").trim().toLowerCase() === email)) {
         notificarError("Este correo ya está registrado");
         return;
     }
@@ -207,6 +217,7 @@ async function register() {
     guardarDatosUsuario(email, usuarioData);
 
     if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
+    if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
     if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
 
     notificarBienvenida(nombre);
@@ -234,6 +245,7 @@ function socialLogin(provider) {
     guardarDatosUsuario(email, usuarioData);
 
     if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
+    if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
     if (typeof inicializarFuncionalidadesAvanzadas === "function") inicializarFuncionalidadesAvanzadas();
 
     notificarBienvenida(nombre);
@@ -268,13 +280,13 @@ function cerrarModalRecuperar() {
 }
 
 function enviarRecuperacion() {
-    const email = (document.getElementById("emailRecuperar")?.value || "").trim();
+    const email = (document.getElementById("emailRecuperar")?.value || "").trim().toLowerCase();
     if (!email) {
         notificarError("Ingresa tu correo electrónico");
         return;
     }
 
-    const usuario = usuariosRegistrados.find(u => u.email === email);
+    const usuario = usuariosRegistrados.find(u => String(u.email || "").trim().toLowerCase() === email);
     if (usuario) {
         const nuevaPass = Math.random().toString(36).slice(-8);
         usuario.password = nuevaPass;
@@ -312,7 +324,11 @@ if (!window.__authClickGuardInstalled) {
         const ahora = Date.now();
         const ultimoIntento = window.__ultimoIntentoRegistro || 0;
         if ((ahora - ultimoIntento) < 4000) {
-            notificarError("Espera unos segundos antes de volver a registrar");
+            if (window.usuarioActual?.email) {
+                mostrarNotificacion("Ya tienes sesión iniciada", "info", "Sesión");
+                return;
+            }
+            mostrarNotificacion("Espera unos segundos antes de volver a registrar", "info", "Registro");
             return;
         }
         window.__ultimoIntentoRegistro = ahora;

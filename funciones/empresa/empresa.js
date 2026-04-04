@@ -80,6 +80,7 @@ function mostrarProductosEmpresa() {
     let html = "";
 
     productos.forEach(producto => {
+        const idArg = JSON.stringify(producto.id);
         const precioConDescuento = Math.round(producto.precio * (1 - descuentoEmpresa / 100));
         html += `
             <div class="product-card">
@@ -93,7 +94,7 @@ function mostrarProductosEmpresa() {
                     </div>
                     <div style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 8px; font-size: 12px; font-weight: 600;">-${descuentoEmpresa}%</div>
                 </div>
-                <button class="btn-add" onclick="agregarAlCarrito(${producto.id})">Agregar +</button>
+                <button class="btn-add" onclick='agregarAlCarrito(${idArg})'>Agregar +</button>
             </div>
         `;
     });

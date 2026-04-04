@@ -2,6 +2,10 @@ function idsIgualesCarrito(a, b) {
     return String(a) === String(b);
 }
 
+function obtenerUsuarioIdNube() {
+    return String(usuarioActual?.uid || usuarioActual?.id || "").trim();
+}
+
 async function cargarCarritoNube() {
     if (!usuarioActual || !window.supabaseClient) return;
     const usuarioId = usuarioActual.uid || usuarioActual.id;
@@ -21,16 +25,21 @@ async function cargarCarritoNube() {
 
         if (data && Array.isArray(data.items)) {
             guardarCarritoUsuario(data.items);
-            actualizarContadorCarrito();
+        } else {
+            // Evita arrastrar contador previo cuando el usuario no tiene carrito en nube.
+            guardarCarritoUsuario([]);
         }
+
+        actualizarContadorCarrito();
     } catch (err) {
         console.error("Error de conexión al cargar carrito nube:", err);
+        actualizarContadorCarrito();
     }
 }
 
 async function guardarCarritoNube(items = null) {
     if (!window.supabaseClient) return;
-    const usuarioId = usuarioActual?.uid || usuarioActual?.id;
+    const usuarioId = obtenerUsuarioIdNube();
     if (!usuarioId) {
         console.log("⚠️ No hay usuario, no se guarda carrito");
         return;
@@ -183,6 +192,7 @@ function mostrarCarrito() {
     }
 
     const carritoUsuario = getCarritoUsuario();
+    const direccionGuardada = String(usuarioData?.ultimaDireccionCompra || "").trim();
 
     if (carritoUsuario.length === 0) {
         container.innerHTML = `
@@ -208,11 +218,11 @@ function mostrarCarrito() {
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div class="cart-quantity">
-                        <span onclick="disminuirCantidad(${idArg})">-</span>
+                        <span onclick='disminuirCantidad(${idArg})'>-</span>
                         <span>${item.cantidad}</span>
-                        <span onclick="aumentarCantidad(${idArg})">+</span>
+                        <span onclick='aumentarCantidad(${idArg})'>+</span>
                     </div>
-                    <span style="color: #999; cursor: pointer;" onclick="eliminarDelCarrito(${idArg})">X</span>
+                    <span style="color: #999; cursor: pointer;" onclick='eliminarDelCarrito(${idArg})'>X</span>
                 </div>
             </div>
         `;
@@ -232,7 +242,8 @@ function mostrarCarrito() {
     const descuentoPuntos = typeof aplicarDescuentoPuntos === "function" ? aplicarDescuentoPuntos(subtotalConDescuento) : 0;
     subtotalConDescuento -= descuentoPuntos;
 
-    const envio = subtotalConDescuento > 500000 ? 0 : 10000;
+    const proActivo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    const envio = proActivo ? 0 : (subtotalConDescuento > 500000 ? 0 : 10000);
     const total = subtotalConDescuento + envio;
 
     container.innerHTML = `
@@ -242,11 +253,16 @@ function mostrarCarrito() {
             ${cuponActivo ? `<div class="summary-row" style="color: #4ade80;"><span>Descuento (${cuponActivo.codigo})</span><span>-${formatCOP(Math.round(descuento))}</span></div>` : ""}
             ${descuentoNivel > 0 ? `<div class="summary-row" style="color: #facc15;"><span>Beneficio por nivel</span><span>-${formatCOP(Math.round(descuentoNivel))}</span></div>` : ""}
             ${descuentoPuntos > 0 ? `<div class="summary-row" style="color: #a78bfa;"><span>Canje de puntos</span><span>-${formatCOP(Math.round(descuentoPuntos))}</span></div>` : ""}
+            ${proActivo ? `<div class="summary-row" style="color: #60a5fa;"><span>Beneficio Modo Pro</span><span>Envío prioritario gratis</span></div>` : ""}
             <div class="summary-row"><span>Envío</span><span>${envio === 0 ? "Gratis" : formatCOP(envio)}</span></div>
             <div class="summary-total"><span>Total</span><span>${formatCOP(Math.round(total))}</span></div>
             ${!cuponActivo ? `<div style="margin-top: 15px;"><div style="display: flex; gap: 10px;"><input type="text" id="codigoCuponCarrito" placeholder="Codigo cupon" style="flex:1; padding: 12px; background: #0F172A; border: 1px solid #2563EB; border-radius: 40px; color: white;"><button class="btn-outline" onclick="aplicarCuponCarrito()">Aplicar</button></div></div>` : ""}
+            <div style="margin-top: 15px;">
+                <label for="direccionEntrega" style="color:#93C5FD; font-size: 13px; display:block; margin-bottom:6px;">Dirección de entrega (obligatoria)</label>
+                <textarea id="direccionEntrega" placeholder="Ej: Calle 45 # 10-30, Apto 502, Bogotá" style="width:100%; min-height:70px; padding:10px; background:#0F172A; border:1px solid #2563EB; border-radius:12px; color:white; resize:vertical;">${direccionGuardada}</textarea>
+            </div>
         </div>
-        <button class="btn-primary" onclick="comprar()" style="margin-top: 20px;">Proceder al pago</button>
+        <button class="btn-primary" onclick="comprar()" style="margin-top: 20px;">Confirmar pedido y seguimiento</button>
     `;
 }
 
@@ -258,9 +274,16 @@ async function comprar() {
     }
 
     const carritoUsuario = getCarritoUsuario();
+    const direccionInput = document.getElementById("direccionEntrega");
+    const direccionEntrega = String(direccionInput?.value || "").trim();
 
     if (carritoUsuario.length === 0) {
         notificarError("Tu carrito está vacío");
+        return;
+    }
+
+    if (direccionEntrega.length < 10) {
+        notificarError("Ingresa una dirección de entrega válida");
         return;
     }
 
@@ -280,7 +303,8 @@ async function comprar() {
     const descuentoPuntos = typeof aplicarDescuentoPuntos === "function" ? aplicarDescuentoPuntos(subtotalConDescuento) : 0;
     subtotalConDescuento -= descuentoPuntos;
 
-    const envio = subtotalConDescuento > 500000 ? 0 : 10000;
+    const proActivo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    const envio = proActivo ? 0 : (subtotalConDescuento > 500000 ? 0 : 10000);
     const totalFinal = subtotalConDescuento + envio;
     const ordenId = Math.floor(Math.random() * 10000);
     const itemsPedido = carritoUsuario.map(item => ({
@@ -298,13 +322,21 @@ async function comprar() {
         subtotal: Math.round(subtotal),
         envio,
         total: Math.round(totalFinal),
-        estado: "pagado"
+        estado: "preparacion",
+        direccionEntrega
     };
+
+    usuarioData.ultimaDireccionCompra = direccionEntrega;
+    if (typeof guardarUsuarioData === "function") guardarUsuarioData();
 
     if (window.supabaseClient) {
         try {
+            const usuarioIdNube = obtenerUsuarioIdNube();
+            if (!usuarioIdNube) {
+                console.warn("Compra guardada solo en local: sesión sin uid/id de Supabase");
+            } else {
             const ordenNube = {
-                usuario_id: String(usuarioActual.uid || usuarioActual.id || usuarioActual.email),
+                usuario_id: usuarioIdNube,
                 usuario_nombre: usuarioActual.nombre,
                 usuario_email: usuarioActual.email,
                 fecha: orden.fecha,
@@ -312,7 +344,7 @@ async function comprar() {
                 subtotal: orden.subtotal,
                 envio: orden.envio,
                 total: orden.total,
-                estado: "pagado",
+                estado: "preparacion",
                 metodo_pago: "pendiente"
             };
 
@@ -324,17 +356,23 @@ async function comprar() {
 
             if (error) {
                 console.error("❌ Error guardando orden:", error);
-                notificarError("Error al procesar la compra");
-                return;
+                if (typeof mostrarNotificacion === "function") {
+                    mostrarNotificacion("Compra realizada, pero no se pudo sincronizar con la nube", "warning", "Sincronización");
+                }
+            }
             }
         } catch (err) {
             console.error("Error guardando orden en Supabase:", err);
-            notificarError("Error al procesar la compra");
-            return;
+            if (typeof mostrarNotificacion === "function") {
+                mostrarNotificacion("Compra realizada, pero hubo un error de sincronización", "warning", "Sincronización");
+            }
         }
     }
 
     agregarAlHistorial(orden);
+    if (typeof actualizarEstadosPedidosAutomatico === "function") {
+        actualizarEstadosPedidosAutomatico();
+    }
 
     if (typeof agregarPuntosPorCompra === "function") {
         agregarPuntosPorCompra(totalFinal);

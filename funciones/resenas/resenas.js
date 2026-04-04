@@ -29,7 +29,7 @@ window.mostrarModalResena = function (productoId, productoNombre) {
                     <textarea id="comentarioResena" rows="4" placeholder="Cuéntanos tu experiencia"></textarea>
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                    <button class="admin-btn" onclick="guardarResena(${JSON.stringify(productoId)})">Publicar</button>
+                    <button class="admin-btn" onclick='guardarResena(${JSON.stringify(productoId)})'>Publicar</button>
                     <button class="admin-btn admin-btn-danger" onclick="cerrarModalResena()">Cancelar</button>
                 </div>
             </div>

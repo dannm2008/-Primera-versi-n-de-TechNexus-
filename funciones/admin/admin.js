@@ -244,8 +244,13 @@ function adminAgregarProducto() {
                 </div>
 
                 <div class="form-group">
-                    <label>Imagen (emoji)</label>
-                    <input type="text" id="newProductImage" placeholder="💻" value="🆕">
+                    <label>Subir imagen (archivo)</label>
+                    <input type="file" id="newProductImageFile" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label>O link de imagen (URL)</label>
+                    <input type="text" id="newProductImageUrl" placeholder="https://.../imagen.png o assets/images/...">
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
@@ -259,13 +264,52 @@ function adminAgregarProducto() {
     document.body.insertAdjacentHTML("beforeend", modalHtml);
 }
 
-function adminGuardarProducto() {
+function adminEsRutaImagenValida(valor) {
+    const v = String(valor || "").trim();
+    if (!v) return false;
+    return /^(https?:\/\/|\.\/|\.\.\/|\/|assets\/|images\/|data:image\/)/i.test(v)
+        || /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(v);
+}
+
+function adminLeerArchivoComoDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+        reader.readAsDataURL(file);
+    });
+}
+
+async function adminGuardarProducto() {
     const nombre = (document.getElementById("newProductName")?.value || "").trim();
     const precio = parseInt(document.getElementById("newProductPrice")?.value || "0", 10);
     const categoria = document.getElementById("newProductCategory")?.value || "accesorios";
     const specs = (document.getElementById("newProductSpecs")?.value || "").trim();
     const stock = parseInt(document.getElementById("newProductStock")?.value || "0", 10);
-    const imagen = (document.getElementById("newProductImage")?.value || "assets/images/products/producto-generico.svg").trim();
+    const imageUrlInput = (document.getElementById("newProductImageUrl")?.value || "").trim();
+    const imageFile = document.getElementById("newProductImageFile")?.files?.[0] || null;
+
+    let imagen = "assets/images/products/producto-generico.svg";
+
+    if (imageFile) {
+        if (!String(imageFile.type || "").startsWith("image/")) {
+            notificarError("El archivo debe ser una imagen");
+            return;
+        }
+
+        try {
+            imagen = await adminLeerArchivoComoDataUrl(imageFile);
+        } catch (_) {
+            notificarError("No se pudo procesar la imagen seleccionada");
+            return;
+        }
+    } else if (imageUrlInput) {
+        if (!adminEsRutaImagenValida(imageUrlInput)) {
+            notificarError("Ingresa un link/ruta de imagen válida");
+            return;
+        }
+        imagen = imageUrlInput;
+    }
 
     if (!nombre || !precio || precio <= 0) {
         notificarError("Completa los campos obligatorios");
@@ -714,17 +758,17 @@ function adminResetTienda() {
 
     productos.length = 0;
     productos.push(
-        { id: 1, nombre: "Laptop Gamer Nitro X", precio: 5200000, imagen: "https://althiqa.com/wp-content/uploads/2022/06/01-16-1024x780.jpg", specs: "Intel i7 • RTX 3050 • 16GB RAM", categoria: "laptops", stock: 10 },
-        { id: 2, nombre: "Desktop Pro Gamer", precio: 8900000, imagen: "https://tse2.mm.bing.net/th/id/OIP.0xuT25C7aWMIAGyCkZ1rHAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Ryzen 9 • RTX 4080 • 32GB RAM", categoria: "desktops", stock: 5 },
-        { id: 3, nombre: "Monitor Curvo 27\"", precio: 1200000, imagen: "https://m.media-amazon.com/images/I/71Fb6HV0QbL._AC_SL1500_.jpg", specs: "240Hz • 1ms • QHD", categoria: "monitores", stock: 15 },
-        { id: 4, nombre: "Teclado Mecánico RGB", precio: 350000, imagen: "https://tse4.mm.bing.net/th/id/OIP.bPl3R1qP-Agt5mcttILp1QHaEK?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Switches Red • RGB", categoria: "accesorios", stock: 25 },
-        { id: 5, nombre: "Mouse Gamer Pro", precio: 280000, imagen: "https://i5.walmartimages.com/asr/a6aa8e6d-4658-4523-8ae3-e093c32793c1_1.04c4c6c67a78ad775bff22ee92514a7b.jpeg", specs: "26000 DPI • Inalámbrico", categoria: "accesorios", stock: 30 },
-        { id: 6, nombre: "Auriculares 7.1", precio: 450000, imagen: "https://tse3.mm.bing.net/th/id/OIP.X3iSlj7EWVPZC61zeH4C_QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Sonido envolvente • RGB", categoria: "accesorios", stock: 20 },
-        { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "https://xrshop.store/cdn/shop/products/hp-zbyhp-z1-g9-workstation-xrshop.png?v=1714734736&width=1946", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
-        { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "https://tse2.mm.bing.net/th/id/OIP.9o2k5k1ycb0AqeCUpgbsywHaCf?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
-        { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "https://www.cyberpuerta.mx/img/product/XL/CP-LENOVO-20KGS47U00-1.jpg", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
-        { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "https://www.omnimediaperu.com/wp-content/uploads/2022/09/equipo-de-videoconferencia-mvc860-yealink-omnimedia-peru.jpg", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
-        { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "https://nexcelsaudi.com/wp-content/uploads/2024/03/FG-1800F-jpg.webp", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
+        { id: 1, nombre: "Laptop Gamer Nitro X", precio: 5200000, imagen: "assets/images/sin-fondo/laptop-gamer-nitro-x.png", specs: "Intel i7 • RTX 3050 • 16GB RAM", categoria: "laptops", stock: 10 },
+        { id: 2, nombre: "Desktop Pro Gamer", precio: 8900000, imagen: "assets/images/sin-fondo/desktop-pro-gamer.png", specs: "Ryzen 9 • RTX 4080 • 32GB RAM", categoria: "desktops", stock: 5 },
+        { id: 3, nombre: "Monitor Curvo 27\"", precio: 1200000, imagen: "assets/images/sin-fondo/monitor-curvo-27.png", specs: "240Hz • 1ms • QHD", categoria: "monitores", stock: 15 },
+        { id: 4, nombre: "Teclado Mecánico RGB", precio: 350000, imagen: "assets/images/sin-fondo/teclado-mecanico-rgb.png", specs: "Switches Red • RGB", categoria: "accesorios", stock: 25 },
+        { id: 5, nombre: "Mouse Gamer Pro", precio: 280000, imagen: "assets/images/sin-fondo/mouse-gamer-pro.png", specs: "26000 DPI • Inalámbrico", categoria: "accesorios", stock: 30 },
+        { id: 6, nombre: "Auriculares 7.1", precio: 450000, imagen: "assets/images/sin-fondo/auriculares-7-1.png", specs: "Sonido envolvente • RGB", categoria: "accesorios", stock: 20 },
+        { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "assets/images/sin-fondo/workstation-empresarial-z9.png", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
+        { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "assets/images/sin-fondo/servidor-rack-mini-8-bahias.png", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
+        { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "assets/images/sin-fondo/laptop-ejecutiva-carbon-pro-14.png", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
+        { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "assets/images/sin-fondo/kit-videoconferencia-4k-team.png", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
+        { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "assets/images/sin-fondo/firewall-corporativo-securegate-x.png", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
     );
     localStorage.setItem("productos", JSON.stringify(productos));
 

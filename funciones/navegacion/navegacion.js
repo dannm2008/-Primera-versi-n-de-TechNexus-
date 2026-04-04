@@ -1,4 +1,10 @@
 function showScreen(screenId) {
+    const requiereSesion = ["cart", "profile", "empresa"].includes(screenId);
+    if (requiereSesion && !usuarioActual) {
+        notificarError("Inicia sesión para acceder a esta sección");
+        screenId = "auth";
+    }
+
     if (usuarioActual && typeof sincronizarUsuarioDataActual === "function") {
         sincronizarUsuarioDataActual();
     }

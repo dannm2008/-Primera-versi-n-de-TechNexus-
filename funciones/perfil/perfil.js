@@ -15,18 +15,172 @@ async function actualizarPerfil() {
         if (editNombre) editNombre.value = usuarioActual.nombre;
         if (editEmail) editEmail.value = usuarioActual.email;
 
+        actualizarAvatarPerfilUI(usuarioData?.fotoPerfil || "");
+        actualizarEstadoModoProUI();
+
         await mostrarHistorialCompras();
-        mostrarDirecciones();
-        mostrarTarjetas();
         await mostrarFavoritos();
         if (typeof actualizarPantallaPuntos === "function") actualizarPantallaPuntos();
     } else {
         profileName.textContent = "Inicia sesión";
         profileEmail.textContent = "usuario@email.com";
         if (profileMemberSince) profileMemberSince.textContent = "Miembro desde: --";
+        actualizarAvatarPerfilUI("");
+
+        const historialCompras = document.getElementById("historialCompras");
+        if (historialCompras) {
+            historialCompras.innerHTML = `<div class="empty-cart" style="background: #1E293B; border-radius: 16px; padding: 40px; text-align: center;"><p style="color: #94A3B8;">Inicia sesión para ver tu historial de compras</p></div>`;
+        }
+
+        const favoritosContainer = document.getElementById("favoritosContainer");
+        if (favoritosContainer) {
+            favoritosContainer.innerHTML = `<div class="empty-cart" style="background: #1E293B; border-radius: 16px; padding: 40px; text-align: center;"><p style="color: #94A3B8;">Inicia sesión para ver tus favoritos</p></div>`;
+        }
+
+        actualizarEstadoModoProUI();
+
         const puntosContainer = document.getElementById("puntos-container");
         if (puntosContainer) puntosContainer.innerHTML = "";
     }
+}
+
+function actualizarEstadoModoProUI() {
+    const estadoNodo = document.getElementById("modoProEstado");
+    const proBtn = document.getElementById("modoProBtn");
+    const proBadge = document.getElementById("profileProBadge");
+
+    if (!estadoNodo) return;
+
+    const activo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    if (activo) {
+        const fecha = new Date(usuarioData.modoProHasta).toLocaleDateString("es-CO");
+        estadoNodo.textContent = `Estado: Pro activo hasta ${fecha}`;
+        estadoNodo.style.color = "#facc15";
+
+        if (proBtn) {
+            proBtn.textContent = "Modo Pro activo";
+            proBtn.classList.add("pro-gold-btn");
+            proBtn.disabled = true;
+        }
+
+        if (proBadge) {
+            proBadge.style.display = "inline-flex";
+        }
+
+        document.body.classList.add("pro-mode-active");
+        return;
+    }
+
+    estadoNodo.textContent = "Estado: Plan estándar";
+    estadoNodo.style.color = "#93C5FD";
+
+    if (proBtn) {
+        proBtn.textContent = "Activar Pro (pago)";
+        proBtn.classList.remove("pro-gold-btn");
+        proBtn.disabled = false;
+    }
+
+    if (proBadge) {
+        proBadge.style.display = "none";
+    }
+
+    document.body.classList.remove("pro-mode-active");
+}
+
+function activarModoPro() {
+    if (!usuarioActual) {
+        mostrarMensaje("Inicia sesión para activar Modo Pro", "error");
+        return;
+    }
+
+    const activo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    if (activo) {
+        mostrarMensaje("Tu Modo Pro ya está activo", "info");
+        return;
+    }
+
+    const confirmado = confirm("Activar Modo Pro con pago mensual para envíos prioritarios y beneficios exclusivos?");
+    if (!confirmado) return;
+
+    const hoy = new Date();
+    const vence = new Date(hoy.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    usuarioData.modoProActivo = true;
+    usuarioData.modoProHasta = vence.toISOString();
+    guardarUsuarioData();
+    actualizarEstadoModoProUI();
+    mostrarMensaje("Modo Pro activado correctamente", "success");
+}
+
+function actualizarAvatarPerfilUI(src) {
+    const img = document.getElementById("profileAvatarImage");
+    const fallback = document.getElementById("profileAvatarFallback");
+    if (!img || !fallback) return;
+
+    const source = String(src || "").trim();
+    if (!source) {
+        img.style.display = "none";
+        img.removeAttribute("src");
+        fallback.style.display = "inline";
+        return;
+    }
+
+    img.src = source;
+    img.style.display = "block";
+    fallback.style.display = "none";
+}
+
+function actualizarFotoPerfil(event) {
+    if (!usuarioActual) {
+        mostrarMensaje("Inicia sesión para cambiar tu foto", "error");
+        return;
+    }
+
+    const file = event?.target?.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        mostrarMensaje("Selecciona un archivo de imagen", "error");
+        event.target.value = "";
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        mostrarMensaje("La foto debe pesar menos de 2MB", "error");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        const dataUrl = String(reader.result || "");
+        if (!dataUrl) return;
+
+        usuarioData.fotoPerfil = dataUrl;
+        guardarUsuarioData();
+        actualizarAvatarPerfilUI(dataUrl);
+        mostrarMensaje("Foto de perfil actualizada", "success");
+        event.target.value = "";
+    };
+    reader.readAsDataURL(file);
+}
+
+function textoEstadoPedido(estado) {
+    const key = String(estado || "").toLowerCase();
+    if (key === "preparacion") return "En preparación";
+    if (key === "en_camino") return "En camino";
+    if (key === "entregado") return "Entregado";
+    if (key === "pagado") return "Pagado";
+    return "Pendiente";
+}
+
+function colorEstadoPedido(estado) {
+    const key = String(estado || "").toLowerCase();
+    if (key === "entregado") return "#2e7d32";
+    if (key === "en_camino") return "#2563EB";
+    if (key === "preparacion") return "#ed6c02";
+    if (key === "pagado") return "#2e7d32";
+    return "#64748b";
 }
 
 function renderHistorialLocal(container) {
@@ -48,14 +202,14 @@ function renderHistorialLocal(container) {
                         <strong style="color: #FFFFFF;">Orden #${ordenIdTexto}</strong>
                         <p style="color: #93C5FD; font-size: 12px;">${orden.fecha}</p>
                     </div>
-                    <span style="background: ${orden.estado === "entregado" ? "#2e7d32" : "#ed6c02"}; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: white;">${orden.estado === "entregado" ? "Entregado" : "En camino"}</span>
+                    <span style="background: ${colorEstadoPedido(orden.estado)}; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: white;">${textoEstadoPedido(orden.estado)}</span>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">${(orden.productos || []).map(p => `<span style="background: #0F172A; padding: 6px 12px; border-radius: 20px; font-size: 13px; color: white;">${p}</span>`).join("")}</div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                     <span style="color: #8B5CF6; font-weight: 700;">${formatCOP(Number(orden.total || 0))}</span>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn-outline" onclick="recomprar(${idArg})" style="padding: 6px 16px; font-size: 13px;">Comprar de nuevo</button>
-                        <button class="btn-outline" onclick="generarFactura(${idArg})" style="padding: 6px 16px; font-size: 13px;">Factura</button>
+                        <button class="btn-outline" onclick='recomprar(${idArg})' style="padding: 6px 16px; font-size: 13px;">Comprar de nuevo</button>
+                        <button class="btn-outline" onclick='generarFactura(${idArg})' style="padding: 6px 16px; font-size: 13px;">Factura</button>
                     </div>
                 </div>
             </div>
@@ -103,12 +257,8 @@ async function mostrarHistorialCompras() {
                     `<span style="background: #0F172A; padding: 4px 8px; border-radius: 12px; font-size: 12px;">${item.nombre} x${item.cantidad}</span>`
                 ).join("");
 
-                const estadoTexto = orden.estado === "pagado"
-                    ? "✓ Pagado"
-                    : orden.estado === "entregado"
-                        ? "📦 Entregado"
-                        : "⏳ Pendiente";
-                const estadoColor = (orden.estado === "pagado" || orden.estado === "entregado") ? "#2e7d32" : "#ed6c02";
+                const estadoTexto = textoEstadoPedido(orden.estado);
+                const estadoColor = colorEstadoPedido(orden.estado);
 
                 html += `
                     <div style="background: #1E293B; border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #2563EB;">
@@ -128,7 +278,7 @@ async function mostrarHistorialCompras() {
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="color: #8B5CF6; font-weight: 700;">${formatCOP(Number(orden.total || 0))}</span>
-                            <button class="btn-outline" onclick="recomprar(${idArg})" style="padding: 6px 16px; font-size: 13px;">Comprar de nuevo</button>
+                            <button class="btn-outline" onclick='recomprar(${idArg})' style="padding: 6px 16px; font-size: 13px;">Comprar de nuevo</button>
                         </div>
                     </div>
                 `;
@@ -141,6 +291,19 @@ async function mostrarHistorialCompras() {
 
     // Fallback local para compatibilidad
     renderHistorialLocal(container);
+}
+
+if (!window.__trackingPedidosIntervalo) {
+    window.__trackingPedidosIntervalo = setInterval(async () => {
+        if (typeof actualizarEstadosPedidosAutomatico !== "function") return;
+        const huboCambios = actualizarEstadosPedidosAutomatico();
+        if (!huboCambios) return;
+
+        const profileScreen = document.getElementById("screen-profile");
+        if (profileScreen && profileScreen.classList.contains("active")) {
+            await mostrarHistorialCompras();
+        }
+    }, 30000);
 }
 
 function mostrarHistorial() {
@@ -223,8 +386,8 @@ async function mostrarFavoritos() {
                 ${renderProductVisual(p.imagen, p.nombre)}
                 <div class="product-title">${p.nombre}</div>
                 <div class="product-price">${formatCOP(p.precio)}</div>
-                <button class="btn-add" onclick="agregarAlCarrito(${idArg})">Agregar +</button>
-                <button class="btn-outline" onclick="quitarFavorito(${idArg})" style="margin-top: 8px; width: 100%;">❤️ Quitar</button>
+                <button class="btn-add" onclick='agregarAlCarrito(${idArg})'>Agregar +</button>
+                <button class="btn-outline" onclick='quitarFavorito(${idArg})' style="margin-top: 8px; width: 100%;">❤️ Quitar</button>
             </div>
         `;
     });
@@ -388,6 +551,9 @@ function cerrarSesion() {
     usuarioActual = null;
     localStorage.removeItem("usuarioActual");
     localStorage.removeItem("usuario");
+
+    if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
+    if (typeof mostrarCarrito === "function") mostrarCarrito();
     if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
     mostrarMensaje("Sesión cerrada");
     showScreen("auth");
@@ -413,3 +579,5 @@ function mostrarSeccionPerfil(seccion) {
         void mostrarFavoritos();
     }
 }
+
+window.activarModoPro = activarModoPro;

@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="modo-brillo-intenso">
     <div class="app-container">
         <div class="app-header">
             <h1 data-i18n="app_title">TechNexus</h1>
@@ -42,22 +42,7 @@
                         <div class="auth-eyebrow">Acceso al sistema</div>
                         <h2>Ingresa tu usuario y compra tu tecnología favorita.</h2>
 
-                        <div class="auth-social-row">
-                            <button class="btn-outline auth-social-btn auth-social-google" onclick="socialLogin('Google')">
-                                <span class="social-icon social-icon-google" aria-hidden="true">G</span>
-                                <span>Google</span>
-                            </button>
-                            <button class="btn-outline auth-social-btn auth-social-apple" onclick="socialLogin('Apple')">
-                                <span class="social-icon social-icon-apple" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" role="img" focusable="false" aria-hidden="true">
-                                        <path fill="currentColor" d="M16.365 1.43c0 1.14-.433 2.204-1.204 2.982-.822.82-1.966 1.345-3.141 1.25-.097-1.086.413-2.192 1.18-2.943C14.05 1.84 15.25 1.34 16.365 1.43Zm4.05 16.3c-.23.52-.51 1.03-.84 1.53-.78 1.18-1.78 2.65-3.06 2.66-1.14.01-1.43-.74-2.98-.75-1.55-.01-1.88.76-3.03.75-1.28-.01-2.26-1.34-3.04-2.52C5.28 16.97 4.3 13.22 5.72 10.66c1.02-1.82 2.86-2.98 4.88-3.01 1.53-.03 2.97.81 3.9.81.93 0 2.65-1.01 4.47-.86.76.06 2.88.31 4.24 2.28-3.47 1.9-2.91 6.86-.8 8.82Z"/>
-                                    </svg>
-                                </span>
-                                <span>Apple</span>
-                            </button>
-                        </div>
-
-                        <div class="auth-divider">O usa Gmail</div>
+                        <div class="auth-divider">Acceso con correo y contraseña</div>
 
                         <div class="form-group">
                             <label for="loginEmail">Gmail</label>
@@ -96,16 +81,19 @@
                 <p style="color: #666; margin-bottom: 20px;">Lo mejor en tecnología para gaming y trabajo</p>
 
                 <div class="product-showcase">
-                    <div class="product-showcase-main card">
-                        <div class="showcase-kicker">SINCRONIZACIÓN DE TIEMPO</div>
-                        <h3>Ofertas Relámpago</h3>
-                        <p>Equipamiento premium con estética sintética, rendimiento extremo y descuentos activos por tiempo limitado.</p>
-                        <div class="showcase-price">COP 8.900.000 <span>COP 10.200.000</span></div>
+                    <div class="product-showcase-main card" id="showcaseMainCard" onclick="abrirOfertaShowcase()" title="Ver producto en oferta">
+                        <div class="showcase-kicker" id="showcaseKicker">SINCRONIZACIÓN DE TIEMPO</div>
+                        <h3 id="showcaseTitulo">Ofertas Relámpago</h3>
+                        <p id="showcaseDescripcion">Equipamiento premium con estética sintética, rendimiento extremo y descuentos activos por tiempo limitado.</p>
+                        <div class="showcase-price" id="showcasePrecio">COP 8.900.000 <span>COP 10.200.000</span></div>
+                        <div class="showcase-stock" id="showcaseStock">Actualizando ofertas...</div>
+                        <button class="showcase-cta" id="showcaseCtaBtn" onclick="comprarOfertaShowcase(event)">Comprar ahora</button>
                     </div>
                     <div class="product-showcase-side card">
                         <div class="showcase-icon">⚡</div>
-                        <h4>Envío Instantáneo</h4>
-                        <p>Las compras de la línea Pro incluyen despacho prioritario y seguimiento en tiempo real.</p>
+                        <h4 id="showcaseSideTitulo">Envío Instantáneo</h4>
+                        <p id="showcaseSideTexto">Las compras de la línea Pro incluyen despacho prioritario y seguimiento en tiempo real.</p>
+                        <button class="showcase-cta secondary" id="showcaseProBtn" onclick="comprarProShowcase(event)">Activar Modo Pro</button>
                     </div>
                 </div>
 
@@ -151,25 +139,30 @@
 
             <div id="screen-profile" class="screen">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <h2 style="color: #FFFFFF;">👤 Mi Perfil</h2>
+                    <h2 style="color: #FFFFFF; display:flex; align-items:center; gap:10px;">👤 Mi Perfil <span id="profileProBadge" class="pro-badge" style="display:none;">Modo Pro</span></h2>
                     <button class="btn-outline" onclick="cerrarSesion()" style="background: #1E293B; border-color: #2563EB; color: white;">
                         Cerrar sesión
                     </button>
                 </div>
 
                 <div class="profile-hero" style="display: flex; align-items: center; gap: 25px; margin-bottom: 30px; background: #1E293B; border-radius: 20px; padding: 20px; border: 1px solid #2563EB;">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">👤</div>
+                    <div id="profileAvatarWrap" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: grid; place-items: center; color: white; font-size: 40px; overflow: hidden; flex-shrink: 0;">
+                        <img id="profileAvatarImage" alt="Foto de perfil" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <span id="profileAvatarFallback" aria-hidden="true">👤</span>
+                    </div>
                     <div>
                         <h2 id="profileName" style="color: #FFFFFF; font-size: 28px;">Inicia sesión</h2>
                         <p id="profileEmail" style="color: #93C5FD;">usuario@email.com</p>
                         <p id="profileMemberSince" style="color: #E0F2FE; font-size: 13px;">Miembro desde: --</p>
+                        <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="actualizarFotoPerfil(event)">
+                            <button class="btn-outline" onclick="document.getElementById('profilePhotoInput')?.click()" style="padding: 6px 12px; font-size: 13px;">Cambiar foto</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="profile-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #2563EB; overflow-x: auto;">
                     <button class="profile-tab active" onclick="mostrarSeccionPerfil('historial')" style="background: transparent; border: none; padding: 12px 24px; color: white; cursor: pointer; font-weight: 600;">📦 Historial</button>
-                    <button class="profile-tab" onclick="mostrarSeccionPerfil('direcciones')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">📍 Direcciones</button>
-                    <button class="profile-tab" onclick="mostrarSeccionPerfil('pagos')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">💳 <span data-i18n="payment_methods">Métodos de pago</span></button>
                     <button class="profile-tab" onclick="mostrarSeccionPerfil('favoritos')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">⭐ <span data-i18n="favorites">Favoritos</span></button>
                     <button class="profile-tab" onclick="mostrarSeccionPerfil('ajustes')" style="background: transparent; border: none; padding: 12px 24px; color: #94A3B8; cursor: pointer;">⚙️ <span data-i18n="settings">Ajustes</span></button>
                 </div>
@@ -179,22 +172,6 @@
                         <div id="puntos-container" style="margin-bottom: 20px;"></div>
                         <h3 style="color: #FFFFFF; margin-bottom: 20px;">📦 <span data-i18n="purchase_history">Historial de compras</span></h3>
                         <div id="historialCompras"></div>
-                    </div>
-
-                    <div id="seccion-direcciones" class="perfil-seccion" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: #FFFFFF;">📍 <span data-i18n="addresses">Mis direcciones</span></h3>
-                            <button class="btn-outline" onclick="agregarDireccion()" style="background: #1E293B; padding: 8px 16px;">+ Agregar nueva</button>
-                        </div>
-                        <div id="direccionesContainer"></div>
-                    </div>
-
-                    <div id="seccion-pagos" class="perfil-seccion" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: #FFFFFF;">💳 <span data-i18n="payment_methods">Métodos de pago</span></h3>
-                            <button class="btn-outline" onclick="agregarTarjeta()" style="background: #1E293B; padding: 8px 16px;">+ Agregar tarjeta</button>
-                        </div>
-                        <div id="tarjetasContainer"></div>
                     </div>
 
                     <div id="seccion-favoritos" class="perfil-seccion" style="display: none;">
@@ -216,6 +193,11 @@
                             <div class="ajuste-item" style="margin-bottom: 20px;">
                                 <label for="editPassword" style="color: #FFFFFF; display: block; margin-bottom: 8px;">Nueva contraseña</label>
                                 <input type="password" id="editPassword" name="editPassword" placeholder="Dejar en blanco para mantener" class="form-input" style="background: #0F172A; border: 1px solid #2563EB; border-radius: 8px; padding: 10px; color: white; width: 100%;">
+                            </div>
+                            <div class="ajuste-item" style="margin-bottom: 20px; background: #0F172A; border: 1px solid #2563EB; border-radius: 12px; padding: 14px;">
+                                <h4 style="color:#FFFFFF; margin-bottom: 8px;">🚀 Modo Pro</h4>
+                                <p id="modoProEstado" style="color:#93C5FD; margin-bottom: 10px;">Estado: Plan estándar</p>
+                                <button class="btn-outline" id="modoProBtn" onclick="activarModoPro()" style="background:#1E293B; border-color:#2563EB;">Activar Pro (pago)</button>
                             </div>
                             <button class="btn-primary" onclick="guardarAjustes()" style="margin-top: 10px;">Guardar cambios</button>
                         </div>
@@ -322,8 +304,9 @@
     <script src="funciones/navegacion/navegacion.js"></script>
     <script src="funciones/inicio/inicio.js"></script>
 
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase SDK (local vendor) -->
+    <script src="assets/vendor/supabase-js-v2.min.js"></script>
+    <script src="assets/vendor/jspdf.umd.min.js"></script>
 
     <script>
         // Configuración de Supabase

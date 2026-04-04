@@ -1,23 +1,23 @@
 const productos = [
-    { id: 1, nombre: "Laptop Gamer Nitro X", precio: 5200000, imagen: "https://althiqa.com/wp-content/uploads/2022/06/01-16-1024x780.jpg", specs: "Intel i7 • RTX 3050 • 16GB RAM", categoria: "laptops", stock: 10 },
-    { id: 2, nombre: "Desktop Pro Gamer", precio: 8900000, imagen: "https://tse2.mm.bing.net/th/id/OIP.0xuT25C7aWMIAGyCkZ1rHAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Ryzen 9 • RTX 4080 • 32GB RAM", categoria: "desktops", stock: 3 },
-    { id: 3, nombre: "Monitor Curvo 27\"", precio: 1200000, imagen: "https://m.media-amazon.com/images/I/71Fb6HV0QbL._AC_SL1500_.jpg", specs: "240Hz • 1ms • QHD", categoria: "monitores", stock: 8 },
-    { id: 4, nombre: "Teclado Mecánico RGB", precio: 350000, imagen: "https://tse4.mm.bing.net/th/id/OIP.bPl3R1qP-Agt5mcttILp1QHaEK?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Switches Red • RGB", categoria: "accesorios", stock: 4 },
-    { id: 5, nombre: "Mouse Gamer Pro", precio: 280000, imagen: "https://i5.walmartimages.com/asr/a6aa8e6d-4658-4523-8ae3-e093c32793c1_1.04c4c6c67a78ad775bff22ee92514a7b.jpeg", specs: "26000 DPI • Inalámbrico", categoria: "accesorios", stock: 12 },
-    { id: 6, nombre: "Auriculares 7.1", precio: 450000, imagen: "https://tse3.mm.bing.net/th/id/OIP.X3iSlj7EWVPZC61zeH4C_QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "Sonido envolvente • RGB", categoria: "accesorios", stock: 5 },
-    { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "https://xrshop.store/cdn/shop/products/hp-zbyhp-z1-g9-workstation-xrshop.png?v=1714734736&width=1946", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
-    { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "https://tse2.mm.bing.net/th/id/OIP.9o2k5k1ycb0AqeCUpgbsywHaCf?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
-    { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "https://www.cyberpuerta.mx/img/product/XL/CP-LENOVO-20KGS47U00-1.jpg", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
-    { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "https://www.omnimediaperu.com/wp-content/uploads/2022/09/equipo-de-videoconferencia-mvc860-yealink-omnimedia-peru.jpg", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
-    { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "https://nexcelsaudi.com/wp-content/uploads/2024/03/FG-1800F-jpg.webp", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
+    { id: 1, nombre: "Laptop Gamer Nitro X", precio: 5200000, imagen: "assets/images/sin-fondo/laptop-gamer-nitro-x.png", specs: "Intel i7 • RTX 3050 • 16GB RAM", categoria: "laptops", stock: 10 },
+    { id: 2, nombre: "Desktop Pro Gamer", precio: 8900000, imagen: "assets/images/sin-fondo/desktop-pro-gamer.png", specs: "Ryzen 9 • RTX 4080 • 32GB RAM", categoria: "desktops", stock: 3 },
+    { id: 3, nombre: "Monitor Curvo 27\"", precio: 1200000, imagen: "assets/images/sin-fondo/monitor-curvo-27.png", specs: "240Hz • 1ms • QHD", categoria: "monitores", stock: 8 },
+    { id: 4, nombre: "Teclado Mecánico RGB", precio: 350000, imagen: "assets/images/sin-fondo/teclado-mecanico-rgb.png", specs: "Switches Red • RGB", categoria: "accesorios", stock: 4 },
+    { id: 5, nombre: "Mouse Gamer Pro", precio: 280000, imagen: "assets/images/sin-fondo/mouse-gamer-pro.png", specs: "26000 DPI • Inalámbrico", categoria: "accesorios", stock: 12 },
+    { id: 6, nombre: "Auriculares 7.1", precio: 450000, imagen: "assets/images/sin-fondo/auriculares-7-1.png", specs: "Sonido envolvente • RGB", categoria: "accesorios", stock: 5 },
+    { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "assets/images/sin-fondo/workstation-empresarial-z9.png", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
+    { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "assets/images/sin-fondo/servidor-rack-mini-8-bahias.png", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
+    { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "assets/images/sin-fondo/laptop-ejecutiva-carbon-pro-14.png", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
+    { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "assets/images/sin-fondo/kit-videoconferencia-4k-team.png", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
+    { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "assets/images/sin-fondo/firewall-corporativo-securegate-x.png", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
 ];
 
 const productosCorporativosBase = [
-    { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "https://xrshop.store/cdn/shop/products/hp-zbyhp-z1-g9-workstation-xrshop.png?v=1714734736&width=1946", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
-    { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "https://tse2.mm.bing.net/th/id/OIP.9o2k5k1ycb0AqeCUpgbsywHaCf?rs=1&pid=ImgDetMain&o=7&rm=3", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
-    { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "https://www.cyberpuerta.mx/img/product/XL/CP-LENOVO-20KGS47U00-1.jpg", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
-    { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "https://www.omnimediaperu.com/wp-content/uploads/2022/09/equipo-de-videoconferencia-mvc860-yealink-omnimedia-peru.jpg", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
-    { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "https://nexcelsaudi.com/wp-content/uploads/2024/03/FG-1800F-jpg.webp", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
+    { id: 101, nombre: "Workstation Empresarial Z9", precio: 12900000, imagen: "assets/images/sin-fondo/workstation-empresarial-z9.png", specs: "Intel Xeon • 64GB RAM • SSD 2TB", categoria: "empresa", stock: 8 },
+    { id: 102, nombre: "Servidor Rack Mini 8 Bahías", precio: 15900000, imagen: "assets/images/sin-fondo/servidor-rack-mini-8-bahias.png", specs: "32 Cores • ECC 128GB • RAID", categoria: "empresa", stock: 5 },
+    { id: 103, nombre: "Laptop Ejecutiva Carbon Pro 14", precio: 7400000, imagen: "assets/images/sin-fondo/laptop-ejecutiva-carbon-pro-14.png", specs: "Intel Ultra 7 • 32GB RAM • 1TB SSD", categoria: "empresa", stock: 14 },
+    { id: 104, nombre: "Kit Videoconferencia 4K Team", precio: 3100000, imagen: "assets/images/sin-fondo/kit-videoconferencia-4k-team.png", specs: "Cámara 4K • Micrófono 360° • AI Noise Cancel", categoria: "empresa", stock: 20 },
+    { id: 105, nombre: "Firewall Corporativo SecureGate X", precio: 5600000, imagen: "assets/images/sin-fondo/firewall-corporativo-securegate-x.png", specs: "VPN • IDS/IPS • Gestión centralizada", categoria: "empresa", stock: 10 }
 ];
 
 let carrito = [];
@@ -32,28 +32,43 @@ let cuponesDisponibles = [
 let usuariosRegistrados = JSON.parse(localStorage.getItem("usuariosRegistrados") || "[]");
 
 const imagenesProductosPorDefecto = {
-    1: "https://althiqa.com/wp-content/uploads/2022/06/01-16-1024x780.jpg",
-    2: "https://tse2.mm.bing.net/th/id/OIP.0xuT25C7aWMIAGyCkZ1rHAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
-    3: "https://m.media-amazon.com/images/I/71Fb6HV0QbL._AC_SL1500_.jpg",
-    4: "https://tse4.mm.bing.net/th/id/OIP.bPl3R1qP-Agt5mcttILp1QHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
-    5: "https://i5.walmartimages.com/asr/a6aa8e6d-4658-4523-8ae3-e093c32793c1_1.04c4c6c67a78ad775bff22ee92514a7b.jpeg",
-    6: "https://tse3.mm.bing.net/th/id/OIP.X3iSlj7EWVPZC61zeH4C_QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+    1: "assets/images/sin-fondo/laptop-gamer-nitro-x.png",
+    2: "assets/images/sin-fondo/desktop-pro-gamer.png",
+    3: "assets/images/sin-fondo/monitor-curvo-27.png",
+    4: "assets/images/sin-fondo/teclado-mecanico-rgb.png",
+    5: "assets/images/sin-fondo/mouse-gamer-pro.png",
+    6: "assets/images/sin-fondo/auriculares-7-1.png",
+    101: "assets/images/sin-fondo/workstation-empresarial-z9.png",
+    102: "assets/images/sin-fondo/servidor-rack-mini-8-bahias.png",
+    103: "assets/images/sin-fondo/laptop-ejecutiva-carbon-pro-14.png",
+    104: "assets/images/sin-fondo/kit-videoconferencia-4k-team.png",
+    105: "assets/images/sin-fondo/firewall-corporativo-securegate-x.png"
 };
 
 function normalizarImagenProducto(producto) {
     const raw = String(producto?.imagen || "").trim();
-    if (raw && !/^[💻🖥️⌨️🖱️🎧🆕📦]$/.test(raw)) return raw;
 
     const id = Number(producto?.id || 0);
     const nombre = String(producto?.nombre || "").toLowerCase();
 
+    // Si ya apunta a nuestros PNG locales, lo respetamos.
+    if (raw.startsWith("assets/images/sin-fondo/")) return raw;
+
+    // Migra automáticamente imágenes antiguas (URLs externas o emojis) a los nuevos assets locales.
     if (imagenesProductosPorDefecto[id]) return imagenesProductosPorDefecto[id];
-    if (nombre.includes("laptop")) return "https://althiqa.com/wp-content/uploads/2022/06/01-16-1024x780.jpg";
-    if (nombre.includes("desktop")) return "https://tse2.mm.bing.net/th/id/OIP.0xuT25C7aWMIAGyCkZ1rHAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
-    if (nombre.includes("monitor")) return "https://m.media-amazon.com/images/I/71Fb6HV0QbL._AC_SL1500_.jpg";
-    if (nombre.includes("teclado")) return "https://tse4.mm.bing.net/th/id/OIP.bPl3R1qP-Agt5mcttILp1QHaEK?rs=1&pid=ImgDetMain&o=7&rm=3";
-    if (nombre.includes("mouse")) return "https://i5.walmartimages.com/asr/a6aa8e6d-4658-4523-8ae3-e093c32793c1_1.04c4c6c67a78ad775bff22ee92514a7b.jpeg";
-    if (nombre.includes("auricular")) return "https://tse3.mm.bing.net/th/id/OIP.X3iSlj7EWVPZC61zeH4C_QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
+
+    const esEmojiPlaceholder = /^[💻🖥️⌨️🖱️🎧🆕📦]$/.test(raw);
+    const esUrlExterna = /^https?:\/\//i.test(raw);
+
+    // Si es una URL externa antigua, intentamos migrarla por nombre antes de respetarla.
+    if (raw && !esEmojiPlaceholder && !esUrlExterna) return raw;
+
+    if (nombre.includes("laptop")) return "assets/images/sin-fondo/laptop-gamer-nitro-x.png";
+    if (nombre.includes("desktop")) return "assets/images/sin-fondo/desktop-pro-gamer.png";
+    if (nombre.includes("monitor")) return "assets/images/sin-fondo/monitor-curvo-27.png";
+    if (nombre.includes("teclado")) return "assets/images/sin-fondo/teclado-mecanico-rgb.png";
+    if (nombre.includes("mouse")) return "assets/images/sin-fondo/mouse-gamer-pro.png";
+    if (nombre.includes("auricular")) return "assets/images/sin-fondo/auriculares-7-1.png";
 
     return "assets/images/products/producto-generico.svg";
 }
@@ -100,7 +115,9 @@ let usuarioData = {
         { id: 1, tipo: "Visa", numero: "**** **** **** 1234", nombre: "Alex Tech", expiracion: "12/25", principal: true },
         { id: 2, tipo: "Mastercard", numero: "**** **** **** 5678", nombre: "Alex Tech", expiracion: "08/26", principal: false }
     ],
-    favoritos: [1, 4, 5]
+    favoritos: [1, 4, 5],
+    modoProActivo: false,
+    modoProHasta: ""
 };
 
 function crearEstructuraUsuarioBase(email, nombre = "Usuario") {
@@ -114,6 +131,8 @@ function crearEstructuraUsuarioBase(email, nombre = "Usuario") {
         direcciones: [],
         tarjetas: [],
         favoritos: [],
+        modoProActivo: false,
+        modoProHasta: "",
         puntos: 0,
         historialPuntos: []
     };
@@ -195,6 +214,36 @@ function guardarAllPedidos(pedidos) {
     localStorage.setItem(historialGlobalKey, JSON.stringify(Array.isArray(pedidos) ? pedidos : []));
 }
 
+function estadoPedidoPorTiempo(fechaISO, estadoActual) {
+    if (String(estadoActual || "") === "entregado") return "entregado";
+
+    const ts = new Date(fechaISO || "").getTime();
+    if (!Number.isFinite(ts)) return estadoActual || "preparacion";
+
+    const transcurrido = Date.now() - ts;
+    if (transcurrido >= 60000) return "entregado";
+    if (transcurrido >= 30000) return "en_camino";
+    return "preparacion";
+}
+
+function actualizarEstadosPedidosAutomatico() {
+    const pedidos = getAllPedidos();
+    if (!pedidos.length) return false;
+
+    let huboCambios = false;
+    pedidos.forEach(pedido => {
+        const nuevoEstado = estadoPedidoPorTiempo(pedido.fecha, pedido.estado);
+        if (nuevoEstado === pedido.estado) return;
+
+        pedido.estado = nuevoEstado;
+        actualizarEstadoPedidoUsuario(pedido.usuarioEmail, pedido.id, nuevoEstado);
+        huboCambios = true;
+    });
+
+    if (huboCambios) guardarAllPedidos(pedidos);
+    return huboCambios;
+}
+
 function actualizarEstadoPedidoUsuario(usuarioEmail, ordenId, nuevoEstado) {
     if (!usuarioEmail) return;
     const datos = getDatosUsuario(usuarioEmail);
@@ -207,6 +256,8 @@ function actualizarEstadoPedidoUsuario(usuarioEmail, ordenId, nuevoEstado) {
     guardarDatosUsuario(usuarioEmail, datos);
     if (usuarioActual && usuarioActual.email === usuarioEmail) usuarioData = datos;
 }
+
+window.actualizarEstadosPedidosAutomatico = actualizarEstadosPedidosAutomatico;
 
 function migrarPerfilLegacyAUsuariosData() {
     const usuariosData = JSON.parse(localStorage.getItem(usuariosDataKey) || "{}");
@@ -223,11 +274,9 @@ function migrarPerfilLegacyAUsuariosData() {
 
 migrarPerfilLegacyAUsuariosData();
 
-const usuarioSesion = JSON.parse(localStorage.getItem("usuarioActual") || localStorage.getItem("usuario") || "null");
-if (usuarioSesion && usuarioSesion.email) {
-    usuarioActual = usuarioSesion;
-    sincronizarUsuarioDataActual();
-}
+// Seguridad: no restauramos sesión automáticamente al recargar.
+// El acceso a historial/notificaciones requiere iniciar sesión de nuevo.
+usuarioActual = null;
 
 window.usuarioActual = usuarioActual;
 
