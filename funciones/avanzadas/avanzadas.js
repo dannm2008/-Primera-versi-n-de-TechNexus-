@@ -55,7 +55,13 @@ function guardarWishlistUsuario() {
 }
 
 function getUsuarioUidActual() {
-    return String(usuarioActual?.uid || usuarioActual?.id || "");
+    if (typeof obtenerUsuarioIdSupabaseSeguro === "function") {
+        return obtenerUsuarioIdSupabaseSeguro();
+    }
+
+    const candidato = String(usuarioActual?.uid || "").trim();
+    if (!candidato) return "";
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidato) ? candidato : "";
 }
 
 async function cargarFavoritosSupabase() {
@@ -440,6 +446,25 @@ function actualizarContadorNotificaciones() {
     badge.style.display = noLeidas > 0 ? "inline-flex" : "none";
 }
 
+function limpiarIndicadorNotificacionesUI(emailUsuario = "") {
+    notificacionesUsuario = [];
+
+    const key = `notificaciones_${String(emailUsuario || "invitado")}`;
+    localStorage.removeItem(key);
+
+    const badge = document.getElementById("notificacionesCount");
+    if (badge) {
+        badge.textContent = "0";
+        badge.style.display = "none";
+    }
+
+    const acciones = document.getElementById("headerAdvancedActions");
+    if (acciones) acciones.remove();
+
+    const modal = document.getElementById("notificacionesModal");
+    if (modal) modal.remove();
+}
+
 function abrirPanelNotificaciones() {
     if (!usuarioActual) {
         notificarError("Inicia sesión para ver notificaciones");
@@ -567,6 +592,7 @@ window.mostrarWishlist = mostrarWishlist;
 window.abrirWishlistModal = abrirWishlistModal;
 window.cerrarWishlistModal = cerrarWishlistModal;
 window.actualizarIconosFavoritosEnProductos = actualizarIconosFavoritosEnProductos;
+window.limpiarIndicadorNotificacionesUI = limpiarIndicadorNotificacionesUI;
 
 async function eliminarDeWishlist(productoId) {
     cargarWishlistUsuario();

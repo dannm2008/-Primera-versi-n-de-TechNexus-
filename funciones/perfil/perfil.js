@@ -17,6 +17,9 @@ async function actualizarPerfil() {
 
         actualizarAvatarPerfilUI(usuarioData?.fotoPerfil || "");
         actualizarEstadoModoProUI();
+        if (usuarioActual?.esEmpresa && typeof mostrarZonaEmpresarial === "function") {
+            mostrarZonaEmpresarial();
+        }
 
         await mostrarHistorialCompras();
         await mostrarFavoritos();
@@ -358,8 +361,11 @@ async function mostrarHistorialCompras() {
         return;
     }
 
-    if (window.supabaseClient && (usuarioActual.id || usuarioActual.uid)) {
-        const usuarioId = String(usuarioActual.uid || usuarioActual.id);
+    const usuarioId = typeof obtenerUsuarioIdSupabaseSeguro === "function"
+        ? obtenerUsuarioIdSupabaseSeguro()
+        : String(usuarioActual?.uid || "").trim();
+
+    if (window.supabaseClient && usuarioId) {
         const { data: ordenes, error } = await window.supabaseClient
             .from("ordenes")
             .select("*")
@@ -672,6 +678,8 @@ function guardarAjustes() {
 }
 
 function cerrarSesion() {
+    const emailAnterior = String(usuarioActual?.email || "").trim();
+
     if (window.supabaseClient?.auth) {
         window.supabaseClient.auth.signOut().catch(err => {
             console.error("Error cerrando sesión en Supabase:", err);
@@ -694,6 +702,7 @@ function cerrarSesion() {
     actualizarBotonProRapido();
 
     if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
+    if (typeof limpiarIndicadorNotificacionesUI === "function") limpiarIndicadorNotificacionesUI(emailAnterior);
     if (typeof mostrarCarrito === "function") mostrarCarrito();
     if (typeof cargarPuntosUsuario === "function") cargarPuntosUsuario();
     mostrarMensaje("Sesión cerrada");

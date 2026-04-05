@@ -120,6 +120,17 @@ let usuarioData = {
     modoProHasta: ""
 };
 
+function esUuidValido(valor) {
+    const texto = String(valor || "").trim();
+    if (!texto) return false;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(texto);
+}
+
+function obtenerUsuarioIdSupabaseSeguro() {
+    const candidato = String(usuarioActual?.uid || "").trim();
+    return esUuidValido(candidato) ? candidato : "";
+}
+
 function crearEstructuraUsuarioBase(email, nombre = "Usuario") {
     const alias = String(email || "usuario").split("@")[0] || "usuario";
     return {
@@ -258,6 +269,8 @@ function actualizarEstadoPedidoUsuario(usuarioEmail, ordenId, nuevoEstado) {
 }
 
 window.actualizarEstadosPedidosAutomatico = actualizarEstadosPedidosAutomatico;
+window.esUuidValido = esUuidValido;
+window.obtenerUsuarioIdSupabaseSeguro = obtenerUsuarioIdSupabaseSeguro;
 
 function migrarPerfilLegacyAUsuariosData() {
     const usuariosData = JSON.parse(localStorage.getItem(usuariosDataKey) || "{}");

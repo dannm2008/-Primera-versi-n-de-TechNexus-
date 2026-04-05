@@ -3,12 +3,18 @@ function idsIgualesCarrito(a, b) {
 }
 
 function obtenerUsuarioIdNube() {
-    return String(usuarioActual?.uid || usuarioActual?.id || "").trim();
+    if (typeof obtenerUsuarioIdSupabaseSeguro === "function") {
+        return obtenerUsuarioIdSupabaseSeguro();
+    }
+
+    const candidato = String(usuarioActual?.uid || "").trim();
+    if (!candidato) return "";
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidato) ? candidato : "";
 }
 
 async function cargarCarritoNube() {
     if (!usuarioActual || !window.supabaseClient) return;
-    const usuarioId = usuarioActual.uid || usuarioActual.id;
+    const usuarioId = obtenerUsuarioIdNube();
     if (!usuarioId) return;
 
     try {
@@ -177,6 +183,22 @@ function guardarCarrito() {
     guardarCarritoNube(carrito);
 }
 
+function esProductoEmpresarialCarrito(item) {
+    if (!item) return false;
+
+    const categoriaItem = String(item.categoria || "").toLowerCase();
+    if (categoriaItem === "empresa") return true;
+
+    const idNumerico = Number(item.id || 0);
+    if (Number.isFinite(idNumerico) && idNumerico >= 101) return true;
+
+    const enCatalogo = Array.isArray(productos)
+        ? productos.find(p => idsIgualesCarrito(p.id, item.id))
+        : null;
+
+    return String(enCatalogo?.categoria || "").toLowerCase() === "empresa";
+}
+
 function mostrarCarrito() {
     const container = document.getElementById("cartContainer");
     if (!container) return;
@@ -204,17 +226,37 @@ function mostrarCarrito() {
         return;
     }
 
+    let subtotalBase = 0;
+    let descuentoEmpresaTotal = 0;
     let subtotal = 0;
     let itemsHtml = "";
 
     carritoUsuario.forEach(item => {
         const idArg = JSON.stringify(item.id);
-        subtotal += item.precio * item.cantidad;
+        const esItemEmpresarial = Boolean(
+            usuarioActual?.esEmpresa
+            && esProductoEmpresarialCarrito(item)
+        );
+        const descuentoEmpresaPctItem = esItemEmpresarial ? Number(usuarioActual?.empresa?.descuento || 15) : 0;
+        const precioUnitarioFinal = descuentoEmpresaPctItem > 0
+            ? Math.round(item.precio * (1 - descuentoEmpresaPctItem / 100))
+            : item.precio;
+        const totalLineaBase = item.precio * item.cantidad;
+        const totalLineaFinal = precioUnitarioFinal * item.cantidad;
+
+        subtotalBase += totalLineaBase;
+        subtotal += totalLineaFinal;
+        descuentoEmpresaTotal += Math.max(0, totalLineaBase - totalLineaFinal);
+
+        const precioLineaHtml = descuentoEmpresaPctItem > 0
+            ? `<div class="cart-item-price"><span style="text-decoration: line-through; color:#94A3B8; font-weight:500; margin-right:8px;">${formatCOP(item.precio)}</span>${formatCOP(precioUnitarioFinal)} <span style="background:#e8f5e9; color:#2e7d32; padding:2px 7px; border-radius:999px; font-size:11px; font-weight:700; margin-left:8px;">-${descuentoEmpresaPctItem}%</span></div>`
+            : `<div class="cart-item-price">${formatCOP(item.precio)}</div>`;
+
         itemsHtml += `
             <div class="cart-item">
                 <div class="cart-item-info">
                     <h4>${item.nombre}</h4>
-                    <div class="cart-item-price">${formatCOP(item.precio)}</div>
+                    ${precioLineaHtml}
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div class="cart-quantity">
@@ -245,11 +287,17 @@ function mostrarCarrito() {
     const proActivo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
     const envio = proActivo ? 0 : (subtotalConDescuento > 500000 ? 0 : 10000);
     const total = subtotalConDescuento + envio;
+    const esCompraEmpresarial = descuentoEmpresaTotal > 0;
+    const textoBotonCompra = esCompraEmpresarial
+        ? "Confirmar compra empresarial"
+        : "Confirmar pedido y seguimiento";
 
     container.innerHTML = `
         ${itemsHtml}
         <div class="cart-summary">
-            <div class="summary-row"><span>Subtotal</span><span>${formatCOP(subtotal)}</span></div>
+            <div class="summary-row"><span>Subtotal</span><span>${formatCOP(subtotalBase)}</span></div>
+            ${descuentoEmpresaTotal > 0 ? `<div class="summary-row" style="color: #4ade80;"><span>Descuento empresarial (15%)</span><span>-${formatCOP(Math.round(descuentoEmpresaTotal))}</span></div>` : ""}
+            <div class="summary-row"><span>Subtotal final</span><span>${formatCOP(subtotal)}</span></div>
             ${cuponActivo ? `<div class="summary-row" style="color: #4ade80;"><span>Descuento (${cuponActivo.codigo})</span><span>-${formatCOP(Math.round(descuento))}</span></div>` : ""}
             ${descuentoNivel > 0 ? `<div class="summary-row" style="color: #facc15;"><span>Beneficio por nivel</span><span>-${formatCOP(Math.round(descuentoNivel))}</span></div>` : ""}
             ${descuentoPuntos > 0 ? `<div class="summary-row" style="color: #a78bfa;"><span>Canje de puntos</span><span>-${formatCOP(Math.round(descuentoPuntos))}</span></div>` : ""}
@@ -262,7 +310,8 @@ function mostrarCarrito() {
                 <textarea id="direccionEntrega" placeholder="Ej: Calle 45 # 10-30, Apto 502, Bogotá" style="width:100%; min-height:70px; padding:10px; background:#0F172A; border:1px solid #2563EB; border-radius:12px; color:white; resize:vertical;">${direccionGuardada}</textarea>
             </div>
         </div>
-        <button class="btn-primary" onclick="comprar()" style="margin-top: 20px;">Confirmar pedido y seguimiento</button>
+        ${esCompraEmpresarial ? `<div style="margin-top: 16px; background:#e8f5e9; color:#2e7d32; border:1px solid #86efac; border-radius:999px; display:inline-flex; align-items:center; gap:8px; padding:8px 12px; font-size:12px; font-weight:700;">🏢 Compra empresarial aplicada (-15%)</div>` : ""}
+        <button class="btn-primary" onclick="comprar()" style="margin-top: 20px;">${textoBotonCompra}</button>
     `;
 }
 
@@ -287,7 +336,26 @@ async function comprar() {
         return;
     }
 
-    const subtotal = carritoUsuario.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    const descuentoEmpresaPctCuenta = Number(usuarioActual?.esEmpresa ? (usuarioActual?.empresa?.descuento || 15) : 0);
+    const resumenEmpresa = carritoUsuario.reduce((acc, item) => {
+        const esItemEmpresarial = Boolean(
+            descuentoEmpresaPctCuenta > 0
+            && esProductoEmpresarialCarrito(item)
+        );
+
+        const baseLinea = item.precio * item.cantidad;
+        const finalLinea = esItemEmpresarial
+            ? Math.round(item.precio * (1 - descuentoEmpresaPctCuenta / 100)) * item.cantidad
+            : baseLinea;
+
+        acc.base += baseLinea;
+        acc.final += finalLinea;
+        acc.descuento += Math.max(0, baseLinea - finalLinea);
+        return acc;
+    }, { base: 0, final: 0, descuento: 0 });
+
+    const subtotal = resumenEmpresa.final;
+    const descuentoEmpresaTotal = resumenEmpresa.descuento;
 
     let descuentoCupon = 0;
     let subtotalConDescuento = subtotal;
@@ -304,6 +372,7 @@ async function comprar() {
     subtotalConDescuento -= descuentoPuntos;
 
     const proActivo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    const descuentoEmpresaPct = descuentoEmpresaTotal > 0 ? descuentoEmpresaPctCuenta : 0;
     const envio = proActivo ? 0 : (subtotalConDescuento > 500000 ? 0 : 10000);
     const totalFinal = subtotalConDescuento + envio;
     const ordenId = Math.floor(Math.random() * 10000);
@@ -323,7 +392,10 @@ async function comprar() {
         envio,
         total: Math.round(totalFinal),
         estado: "preparacion",
-        direccionEntrega
+        direccionEntrega,
+        esCompraEmpresarial: descuentoEmpresaTotal > 0,
+        descuentoEmpresaPct,
+        descuentoEmpresaValor: Math.round(descuentoEmpresaTotal)
     };
 
     usuarioData.ultimaDireccionCompra = direccionEntrega;
@@ -345,7 +417,10 @@ async function comprar() {
                 envio: orden.envio,
                 total: orden.total,
                 estado: "preparacion",
-                metodo_pago: "pendiente"
+                metodo_pago: "pendiente",
+                es_compra_empresarial: orden.esCompraEmpresarial,
+                descuento_empresa_pct: orden.descuentoEmpresaPct,
+                descuento_empresa_valor: orden.descuentoEmpresaValor
             };
 
             console.log("📦 Guardando orden:", ordenNube);
@@ -370,6 +445,18 @@ async function comprar() {
     }
 
     agregarAlHistorial(orden);
+
+    if (orden.esCompraEmpresarial && usuarioActual?.empresa) {
+        const comprasActuales = Number(usuarioActual.empresa.comprasEsteMes || 0);
+        const ahorroActual = Number(usuarioActual.empresa.ahorroAnual || 0);
+        usuarioActual.empresa.comprasEsteMes = comprasActuales + 1;
+        usuarioActual.empresa.ahorroAnual = ahorroActual + Number(orden.descuentoEmpresaValor || 0);
+
+        if (typeof guardarUsuarioData === "function") guardarUsuarioData();
+        localStorage.setItem("usuarioActual", JSON.stringify(usuarioActual));
+        localStorage.setItem("usuario", JSON.stringify(usuarioActual));
+    }
+
     if (typeof actualizarEstadosPedidosAutomatico === "function") {
         actualizarEstadosPedidosAutomatico();
     }

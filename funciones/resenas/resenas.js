@@ -77,17 +77,26 @@ window.guardarResena = async function (productoId) {
         return;
     }
 
+    const usuarioIdSeguro = typeof obtenerUsuarioIdSupabaseSeguro === "function"
+        ? obtenerUsuarioIdSupabaseSeguro()
+        : "";
+
+    const payload = {
+        producto_id: String(idProducto),
+        usuario_nombre: usuarioActual?.nombre || "Usuario",
+        usuario_email: usuarioActual?.email || "",
+        titulo: "Reseña de usuario",
+        calificacion: estrellaSeleccionada,
+        comentario
+    };
+
+    if (usuarioIdSeguro) {
+        payload.usuario_id = usuarioIdSeguro;
+    }
+
     const { error } = await window.supabaseClient
         .from("resenas")
-        .insert({
-            producto_id: String(idProducto),
-            usuario_id: String(usuarioActual?.uid || usuarioActual?.id || ""),
-            usuario_nombre: usuarioActual?.nombre || "Usuario",
-            usuario_email: usuarioActual?.email || "",
-            titulo: "Reseña de usuario",
-            calificacion: estrellaSeleccionada,
-            comentario
-        });
+        .insert(payload);
 
     if (error) {
         alert("❌ Error al publicar reseña");
