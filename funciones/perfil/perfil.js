@@ -44,6 +44,127 @@ async function actualizarPerfil() {
     }
 }
 
+let proFxInterval = null;
+let proFxClickHookInstalled = false;
+
+function actualizarBotonProRapido() {
+    const quickBtn = document.getElementById("modoProQuickBtn");
+    if (!quickBtn) return;
+
+    const activo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+
+    if (!usuarioActual) {
+        quickBtn.textContent = "✨ Inicia sesión para Pro";
+        quickBtn.classList.remove("active");
+        return;
+    }
+
+    if (activo) {
+        quickBtn.textContent = "👑 Modo Pro activo";
+        quickBtn.classList.add("active");
+        return;
+    }
+
+    quickBtn.textContent = "✨ Activar Modo Pro";
+    quickBtn.classList.remove("active");
+}
+
+function crearSparkPro(x, y, duracionMs = 2800) {
+    const spark = document.createElement("span");
+    spark.className = "pro-spark";
+    spark.style.setProperty("--spark-x", `${Math.round(x)}px`);
+    spark.style.setProperty("--spark-y", `${Math.round(y)}px`);
+    spark.style.setProperty("--spark-drift", `${Math.round((Math.random() - 0.5) * 70)}px`);
+    spark.style.setProperty("--spark-duration", `${Math.round(duracionMs)}ms`);
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), Math.max(900, Math.round(duracionMs + 250)));
+}
+
+function limpiarSparksPro() {
+    document.querySelectorAll(".pro-spark").forEach(n => n.remove());
+}
+
+function lanzarConfetiPro(cantidad = 28) {
+    if (!document.body.classList.contains("pro-mode-active")) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const total = Math.min(Math.max(Number(cantidad || 0), 8), 40);
+    for (let i = 0; i < total; i++) {
+        const pieza = document.createElement("span");
+        pieza.className = "pro-confetti";
+        pieza.style.setProperty("--confetti-x", `${Math.round(Math.random() * window.innerWidth)}px`);
+        pieza.style.setProperty("--confetti-size", `${Math.round(6 + Math.random() * 6)}px`);
+        pieza.style.setProperty("--confetti-hue", `${Math.round(30 + Math.random() * 35)}`);
+        pieza.style.setProperty("--confetti-drift", `${Math.round((Math.random() - 0.5) * 140)}px`);
+        pieza.style.setProperty("--confetti-duration", `${Math.round(1400 + Math.random() * 1200)}ms`);
+        document.body.appendChild(pieza);
+        setTimeout(() => pieza.remove(), 3000);
+    }
+}
+
+function limpiarConfetiPro() {
+    document.querySelectorAll(".pro-confetti").forEach(n => n.remove());
+}
+
+function detenerFxModoProLigero() {
+    if (proFxInterval) {
+        clearInterval(proFxInterval);
+        proFxInterval = null;
+    }
+    limpiarSparksPro();
+    limpiarConfetiPro();
+}
+
+function iniciarFxModoProLigero() {
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion || proFxInterval) return;
+
+    proFxInterval = setInterval(() => {
+        if (!document.body.classList.contains("pro-mode-active")) return;
+        if (document.hidden) return;
+
+        const activos = document.querySelectorAll(".pro-spark").length;
+        if (activos > 14) {
+            const viejo = document.querySelector(".pro-spark");
+            if (viejo) viejo.remove();
+        }
+
+        crearSparkPro(Math.random() * window.innerWidth, window.innerHeight + 8, 2600 + Math.random() * 1200);
+    }, 1400);
+
+    if (!proFxClickHookInstalled) {
+        document.addEventListener("click", (e) => {
+            if (!document.body.classList.contains("pro-mode-active")) return;
+            if (!e.target.closest(".btn-primary, .btn-add, .btn-outline, .showcase-cta")) return;
+
+            const x = Number(e.clientX || 0);
+            const y = Number(e.clientY || 0);
+            for (let i = 0; i < 3; i++) {
+                crearSparkPro(x + (Math.random() - 0.5) * 24, y + (Math.random() - 0.5) * 16, 900 + Math.random() * 450);
+            }
+        }, { passive: true });
+        proFxClickHookInstalled = true;
+    }
+}
+
+function abrirPanelProRapido() {
+    if (!usuarioActual) {
+        mostrarMensaje("Inicia sesión para activar Modo Pro", "error");
+        showScreen("auth");
+        return;
+    }
+
+    const activo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    if (activo) {
+        showScreen("profile");
+        mostrarSeccionPerfil("ajustes");
+        mostrarMensaje("Tu Modo Pro ya está activo", "info");
+        return;
+    }
+
+    activarModoPro();
+}
+
 function actualizarEstadoModoProUI() {
     const estadoNodo = document.getElementById("modoProEstado");
     const proBtn = document.getElementById("modoProBtn");
@@ -51,14 +172,15 @@ function actualizarEstadoModoProUI() {
 
     if (!estadoNodo) return;
 
-    const activo = Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
+    const esAdminActivo = Boolean(usuarioActual?.esAdmin);
+    const activo = esAdminActivo || Boolean(usuarioData?.modoProActivo && usuarioData?.modoProHasta && new Date(usuarioData.modoProHasta).getTime() > Date.now());
     if (activo) {
-        const fecha = new Date(usuarioData.modoProHasta).toLocaleDateString("es-CO");
-        estadoNodo.textContent = `Estado: Pro activo hasta ${fecha}`;
+        const fecha = !esAdminActivo && usuarioData?.modoProHasta ? new Date(usuarioData.modoProHasta).toLocaleDateString("es-CO") : null;
+        estadoNodo.textContent = esAdminActivo ? "Estado: Pro administrador activo" : `Estado: Pro activo hasta ${fecha}`;
         estadoNodo.style.color = "#facc15";
 
         if (proBtn) {
-            proBtn.textContent = "Modo Pro activo";
+            proBtn.textContent = esAdminActivo ? "Modo Pro administrador" : "Modo Pro activo";
             proBtn.classList.add("pro-gold-btn");
             proBtn.disabled = true;
         }
@@ -68,6 +190,9 @@ function actualizarEstadoModoProUI() {
         }
 
         document.body.classList.add("pro-mode-active");
+        document.body.classList.add("modo-brillo-intenso");
+        iniciarFxModoProLigero();
+        actualizarBotonProRapido();
         return;
     }
 
@@ -84,7 +209,12 @@ function actualizarEstadoModoProUI() {
         proBadge.style.display = "none";
     }
 
-    document.body.classList.remove("pro-mode-active");
+    if (!esAdminActivo) {
+        document.body.classList.remove("pro-mode-active");
+        document.body.classList.remove("modo-brillo-intenso");
+    }
+    detenerFxModoProLigero();
+    actualizarBotonProRapido();
 }
 
 function activarModoPro() {
@@ -548,11 +678,20 @@ function cerrarSesion() {
         });
     }
 
+    // Limpia contador/carrito visible al cerrar sesión.
+    if (typeof guardarCarritoUsuario === "function") guardarCarritoUsuario([]);
+    if (typeof guardarCarritoNube === "function") {
+        Promise.resolve(guardarCarritoNube([])).catch(() => {});
+    }
+
     usuarioActual = null;
     localStorage.removeItem("usuarioActual");
     localStorage.removeItem("usuario");
     localStorage.removeItem("ultimaPantalla");
     if (typeof limpiarCamposAuth === "function") limpiarCamposAuth();
+    document.body.classList.remove("modo-brillo-intenso");
+    detenerFxModoProLigero();
+    actualizarBotonProRapido();
 
     if (typeof actualizarContadorCarrito === "function") actualizarContadorCarrito();
     if (typeof mostrarCarrito === "function") mostrarCarrito();
@@ -583,3 +722,5 @@ function mostrarSeccionPerfil(seccion) {
 }
 
 window.activarModoPro = activarModoPro;
+window.abrirPanelProRapido = abrirPanelProRapido;
+window.lanzarConfetiPro = lanzarConfetiPro;

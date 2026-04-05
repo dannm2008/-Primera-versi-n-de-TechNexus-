@@ -154,7 +154,7 @@ function mostrarProductosFiltrados(productosFiltrados) {
         }
 
         html += `
-            <div class="product-card">
+            <div class="product-card" data-cat="${String(producto.categoria || "accesorios")}">
                 ${renderProductVisual(producto.imagen, producto.nombre)}
                 <div class="product-title">${producto.nombre}</div>
                 <div class="product-spec">${producto.specs}</div>

@@ -198,7 +198,7 @@ function mostrarCarrito() {
         container.innerHTML = `
             <div class="empty-cart">
                 <h3>Tu carrito está vacío</h3>
-                <button class="btn-primary" style="width: auto; margin:0 auto;" onclick="showScreen('products')">Ver productos</button>
+                <button class="btn-primary btn-gold-cta" style="width: auto; margin:0 auto;" onclick="showScreen('products')">Ver productos</button>
             </div>
         `;
         return;
@@ -398,6 +398,9 @@ async function comprar() {
     notificarCompraExitosa(totalFinal);
     notificarEnvio(ordenId);
     if (typeof notificarPedidoEnviado === "function") notificarPedidoEnviado(ordenId);
+    if (proActivo && typeof lanzarConfetiPro === "function") {
+        lanzarConfetiPro(30);
+    }
     if (typeof actualizarPerfil === "function") actualizarPerfil();
     showScreen("products");
 }
@@ -405,7 +408,10 @@ async function comprar() {
 function actualizarContadorCarrito() {
     const total = getCarritoUsuario().reduce((sum, item) => sum + item.cantidad, 0);
     const badge = document.getElementById("cartCount");
-    if (badge) badge.textContent = String(total);
+    if (!badge) return;
+
+    badge.textContent = String(total);
+    badge.style.display = total > 0 ? "inline-flex" : "none";
 }
 
 window.agregarAlCarrito = agregarAlCarrito;

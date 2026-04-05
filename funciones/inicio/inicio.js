@@ -52,6 +52,13 @@ function actualizarBotonProShowcase() {
         return;
     }
 
+    if (usuarioActual?.esAdmin) {
+        proBtn.disabled = false;
+        proBtn.textContent = "Panel Admin Pro";
+        proBtn.classList.add("pro-gold-btn");
+        return;
+    }
+
     if (usuarioTieneProActivo()) {
         proBtn.disabled = true;
         proBtn.textContent = "Modo Pro activo";
@@ -70,6 +77,17 @@ function comprarProShowcase(event) {
     if (!usuarioActual) {
         notificarError("Inicia sesión para activar Modo Pro");
         showScreen("auth");
+        return;
+    }
+
+    if (usuarioActual?.esAdmin) {
+        if (typeof showAdminPanel === "function") {
+            showAdminPanel();
+            return;
+        }
+
+        showScreen("profile");
+        if (typeof mostrarSeccionPerfil === "function") mostrarSeccionPerfil("ajustes");
         return;
     }
 
@@ -255,6 +273,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (usuarioActual && typeof sincronizarUsuarioDataActual === "function") {
         sincronizarUsuarioDataActual();
+    }
+
+    if (typeof actualizarBotonProRapido === "function") {
+        actualizarBotonProRapido();
     }
 
     if (usuarioActual) {

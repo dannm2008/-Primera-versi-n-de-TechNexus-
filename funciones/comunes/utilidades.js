@@ -28,7 +28,7 @@ function renderProductVisual(imagen, nombre = "Producto") {
     if (pareceRutaImagen) {
         return `
             <div class="product-media">
-                <img class="product-image" src="${srcFinal}" alt="${alt}" loading="lazy" decoding="async" onload="procesarFondoBlancoProducto(this)">
+                <img class="product-image" src="${srcFinal}" alt="${alt}" decoding="async">
             </div>
         `;
     }

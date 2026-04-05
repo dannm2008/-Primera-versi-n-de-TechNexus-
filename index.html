@@ -11,11 +11,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="modo-brillo-intenso">
+<body>
     <div class="app-container">
         <div class="app-header">
-            <h1 data-i18n="app_title">TechNexus</h1>
-            <p data-i18n="app_subtitle">Productos tecnológicos de alta gama</p>
+            <div class="app-header-main">
+                <div>
+                    <h1 data-i18n="app_title">TechNexus</h1>
+                    <p data-i18n="app_subtitle">Productos tecnológicos de alta gama</p>
+                </div>
+                <button id="modoProQuickBtn" class="btn-pro-quick" onclick="abrirPanelProRapido()">✨ Activar Modo Pro</button>
+            </div>
         </div>
 
         <div class="main-content" id="mainContent">
@@ -39,36 +44,38 @@
                     </div>
 
                     <div class="card auth-form-panel">
-                        <div class="auth-eyebrow">Acceso al sistema</div>
-                        <h2>Ingresa tu usuario y compra tu tecnología favorita.</h2>
+                        <form onsubmit="login(); return false;">
+                            <div class="auth-eyebrow">Acceso al sistema</div>
+                            <h2>Ingresa tu usuario y compra tu tecnología favorita.</h2>
 
-                        <div class="auth-divider">Acceso con correo y contraseña</div>
+                            <div class="auth-divider">Acceso con correo y contraseña</div>
 
-                        <div class="form-group">
-                            <label for="loginEmail">Gmail</label>
-                            <input type="email" id="loginEmail" name="loginEmail" autocomplete="email" placeholder="tu@gmail.com">
-                        </div>
+                            <div class="form-group">
+                                <label for="loginEmail">Gmail</label>
+                                <input type="email" id="loginEmail" name="loginEmail" autocomplete="email" placeholder="tu@gmail.com">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="loginPassword">Contraseña</label>
-                            <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" placeholder="••••••••">
-                        </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Contraseña</label>
+                                <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" placeholder="••••••••">
+                            </div>
 
-                        <div class="auth-row">
-                            <label class="auth-remember" for="terms">
-                                <input type="checkbox" id="terms" name="terms">
-                                Mantener sesión iniciada por 30 días
-                            </label>
-                            <a href="#" onclick="mostrarRecuperarPassword()">¿Olvidaste tu contraseña?</a>
-                        </div>
+                            <div class="auth-row">
+                                <label class="auth-remember" for="terms">
+                                    <input type="checkbox" id="terms" name="terms">
+                                    Mantener sesión iniciada por 30 días
+                                </label>
+                                <a href="#" onclick="mostrarRecuperarPassword()">¿Olvidaste tu contraseña?</a>
+                            </div>
 
-                        <button class="btn-primary auth-submit" onclick="login()">
-                            Iniciar sesión segura <span>→</span>
-                        </button>
+                            <button class="btn-primary auth-submit" type="submit">
+                                Iniciar sesión segura <span>→</span>
+                            </button>
+                        </form>
 
                         <div class="auth-register-row">
                             <span>¿No tienes cuenta?</span>
-                            <button class="btn-outline auth-register-btn" onclick="register()">Crear cuenta</button>
+                            <button class="btn-outline auth-register-btn" type="button" onclick="register()">Crear cuenta</button>
                         </div>
 
                         <div class="auth-footnote">Acceso seguro · IP registrada</div>
@@ -192,14 +199,16 @@
                             </div>
                             <div class="ajuste-item" style="margin-bottom: 20px;">
                                 <label for="editPassword" style="color: #FFFFFF; display: block; margin-bottom: 8px;">Nueva contraseña</label>
-                                <input type="password" id="editPassword" name="editPassword" placeholder="Dejar en blanco para mantener" class="form-input" style="background: #0F172A; border: 1px solid #2563EB; border-radius: 8px; padding: 10px; color: white; width: 100%;">
+                                <form onsubmit="guardarAjustes(); return false;">
+                                    <input type="password" id="editPassword" name="editPassword" placeholder="Dejar en blanco para mantener" class="form-input" style="background: #0F172A; border: 1px solid #2563EB; border-radius: 8px; padding: 10px; color: white; width: 100%;">
+                                </form>
                             </div>
                             <div class="ajuste-item" style="margin-bottom: 20px; background: #0F172A; border: 1px solid #2563EB; border-radius: 12px; padding: 14px;">
                                 <h4 style="color:#FFFFFF; margin-bottom: 8px;">🚀 Modo Pro</h4>
                                 <p id="modoProEstado" style="color:#93C5FD; margin-bottom: 10px;">Estado: Plan estándar</p>
                                 <button class="btn-outline" id="modoProBtn" onclick="activarModoPro()" style="background:#1E293B; border-color:#2563EB;">Activar Pro (pago)</button>
                             </div>
-                            <button class="btn-primary" onclick="guardarAjustes()" style="margin-top: 10px;">Guardar cambios</button>
+                            <button class="btn-primary" type="button" onclick="guardarAjustes()" style="margin-top: 10px;">Guardar cambios</button>
                         </div>
                     </div>
                 </div>
@@ -208,7 +217,7 @@
             <div id="screen-empresa" class="screen">
                 <div style="margin-bottom: 20px;">
                     <h2>🏢 Zona Empresarial</h2>
-                    <p style="color: #666;">Precios especiales y catálogo B2B</p>
+                    <p style="color: #FFFFFF;">Precios especiales y catálogo B2B</p>
                 </div>
 
                 <div id="empresaNoRegistrada" class="card company-cta" style="text-align: center; padding: 40px;">
@@ -218,7 +227,7 @@
                         Regístrate para acceder a precios por volumen,
                         facturación especial y envíos prioritarios.
                     </p>
-                    <button class="btn-primary" style="width: auto; margin: 0 auto;" onclick="solicitarRegistroEmpresa()">
+                    <button class="btn-primary btn-gold-cta" style="width: auto; margin: 0 auto;" onclick="solicitarRegistroEmpresa()">
                         Solicitar registro empresarial →
                     </button>
                 </div>

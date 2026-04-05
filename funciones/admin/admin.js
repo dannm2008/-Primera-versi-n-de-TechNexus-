@@ -5,6 +5,19 @@ const ADMIN_PASSWORD = "admin123";
 
 let esAdmin = false;
 
+function actualizarModoProAdminUI() {
+    if (esAdmin) {
+        document.body.classList.add("pro-mode-active");
+        document.body.classList.add("modo-brillo-intenso");
+        return;
+    }
+
+    if (!usuarioData?.modoProActivo) {
+        document.body.classList.remove("pro-mode-active");
+        document.body.classList.remove("modo-brillo-intenso");
+    }
+}
+
 function getPedidosAdmin() {
     return getAllPedidos();
 }
@@ -45,6 +58,7 @@ function verificarAdmin() {
     esAdmin = Boolean(usuarioActual && usuarioActual.email === ADMIN_EMAIL);
     if (esAdmin) mostrarBotonAdmin();
     else ocultarBotonAdmin();
+    actualizarModoProAdminUI();
     return esAdmin;
 }
 
