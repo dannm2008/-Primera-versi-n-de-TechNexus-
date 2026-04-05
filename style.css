@@ -4249,9 +4249,10 @@ body.modo-brillo-intenso .showcase-cta {
         width: auto !important;
         min-width: 0 !important;
         flex: none !important;
+        flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        gap: 4px !important;
+        gap: 3px !important;
         padding: 8px 4px !important;
     }
 
@@ -4263,6 +4264,7 @@ body.modo-brillo-intenso .showcase-cta {
         font-size: 10px !important;
         line-height: 1.1;
         white-space: nowrap;
+        text-align: center;
     }
 }
 
@@ -4293,6 +4295,8 @@ body.modo-brillo-intenso .showcase-cta {
     .nav-item {
         padding: 7px 2px !important;
         border-radius: 14px !important;
+        flex-direction: column !important;
+        gap: 2px !important;
     }
 
     .nav-item span:first-child {
